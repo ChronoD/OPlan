@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<opml version="2.0">
+	<head>
+		<title>states.opml</title>
+	</head>
+	<body>
+		<outline text="United States">
+			<outline text="Far West">
+				<outline text="Alaska"/>
+			</outline>
+		</outline>
+	</body>
+</opml>
