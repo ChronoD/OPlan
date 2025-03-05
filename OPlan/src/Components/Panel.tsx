@@ -11,6 +11,8 @@ import {
   TextareaAutosize,
   FormGroup,
   FormControlLabel,
+  Button,
+  Box,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
 import { JsonForXml, OPlanState } from "../state/types";
@@ -60,6 +62,9 @@ function Panel() {
     };
   }
 
+  const json = stateToXmlJson(state);
+  const xml = json ? opml.stringify(json) : null;
+  const file = new Blob([xml], { type: "text/plain" });
   return (
     <>
       <Grid2 container spacing={2} style={{ height: "101vh" }}>
@@ -91,6 +96,42 @@ function Panel() {
         </Grid2>
         <Grid2 size={{ xs: 6, md: 4 }}>
           <Grid2 size={8} style={{ width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Button
+                sx={{
+                  width: "200px",
+                  marginBottom: "12px",
+                  borderRadius: "50px",
+                }}
+                onClick={() => {
+                  navigator.clipboard.writeText(xml);
+                }}
+                variant="outlined"
+              >
+                Copy to Clipboard
+              </Button>
+              <Button
+                sx={{
+                  width: "200px",
+                  marginBottom: "12px",
+                  borderRadius: "50px",
+                }}
+                variant="contained"
+              >
+                <a
+                  download="outlines.opml"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={URL.createObjectURL(file)}
+                  style={{
+                    textDecoration: "inherit",
+                    color: "inherit",
+                  }}
+                >
+                  Export to file
+                </a>
+              </Button>
+            </Box>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -100,11 +141,11 @@ function Panel() {
                     inputProps={{ "aria-label": "Toggle preview" }}
                   />
                 }
-                label="Hide opml preview"
+                label="OPML PREVIEW"
               />
             </FormGroup>
 
-            {state.showXml && <Preview json={stateToXmlJson(state)} />}
+            {state.showXml && <Preview xml={xml} />}
           </Grid2>
         </Grid2>
         {/* <input
