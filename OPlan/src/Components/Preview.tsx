@@ -1,19 +1,18 @@
 import "../App.css";
-import opml from "opml";
 import { Box, TextareaAutosize } from "@mui/material";
 
 type PreviewProps = {
-  json: {} | undefined;
+  xml: string | undefined;
 };
 
-function Preview({ json }: PreviewProps) {
+function Preview({ xml }: PreviewProps) {
   return (
     <Box flexDirection="column">
       <TextareaAutosize
         style={{ minHeight: "60%", width: "100%" }}
         aria-label="empty textarea"
         placeholder=">"
-        value={json && opml.stringify(json)}
+        value={xml}
       />
     </Box>
   );
