@@ -11,12 +11,14 @@ export interface OutlineMap {
 export interface NormalizedOutline {
   id: string;
   text: string | undefined;
+  _note: string | undefined;
   items: string[];
 }
 
 export interface Outline {
   id: string;
   text: string | undefined;
+  _note: string | undefined;
   subs: Outline[];
 }
 

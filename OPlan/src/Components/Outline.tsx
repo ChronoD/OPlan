@@ -1,5 +1,5 @@
 import "../App.css";
-import { IconButton, TextareaAutosize } from "@mui/material";
+import { Box, IconButton, TextareaAutosize } from "@mui/material";
 import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
 import { ActionTypes } from "../state/actions";
@@ -40,6 +40,13 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     });
   }
 
+  function onNoteUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
+    dispatch({
+      type: ActionTypes.NOTE_UPDATED,
+      payload: { textInput: event.target.value, id: event.target.id },
+    });
+  }
+
   function onKeyDown(event: KeyboardEventHandler<HTMLTextAreaElement>) {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -47,9 +54,24 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     }
     if (event.key === "Tab") {
       event.preventDefault();
-      onAddClicked(outline.id)();
+      onAddClicked(outline ? outline.id : "id")();
     }
   }
+
+  const styles = {
+    container: {
+      display: "flex",
+      flexWrap: "wrap",
+    },
+    textField: {
+      width: 300,
+      margin: 100,
+    },
+    //style for font size
+    resize: {
+      fontSize: 50,
+    },
+  };
 
   return (
     <>
@@ -77,15 +99,34 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
             >
               <RemoveIcon />
             </IconButton>
-            <TextareaAutosize
-              style={{ minHeight: "20px", minWidth: "600px" }}
-              aria-label="empty textarea"
-              placeholder=">"
-              value={outline.text}
-              id={outline.id}
-              onChange={onInputUpdate}
-              onKeyDown={onKeyDown}
-            />
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <TextareaAutosize
+                style={{
+                  minHeight: "20px",
+                  minWidth: "600px",
+                  fontSize: "20px",
+                }}
+                aria-label="empty textarea"
+                placeholder=">"
+                value={outline.text}
+                id={outline.id}
+                onChange={onInputUpdate}
+                onKeyDown={onKeyDown}
+              />
+              <TextareaAutosize
+                style={{
+                  width: "600px",
+                  background: "#6d7271",
+                  fontSize: "16px",
+                }}
+                aria-label="empty textarea"
+                placeholder=""
+                value={outline._note}
+                id={outline.id + "_note"}
+                onChange={onNoteUpdate}
+                onKeyDown={onKeyDown}
+              />
+            </Box>
             <IconButton style={{ padding: 0 }} onClick={addSibling}>
               <AddIcon />
             </IconButton>
