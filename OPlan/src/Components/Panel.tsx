@@ -77,7 +77,7 @@ function Panel() {
           }}
         >
           <TextareaAutosize
-            style={{ minHeight: "20px", width: "300px" }}
+            style={{ minHeight: "20px", width: "300px", fontSize: "22px" }}
             aria-label="Title"
             placeholder=">"
             value={state.title}

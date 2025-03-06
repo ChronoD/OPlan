@@ -2,6 +2,7 @@
 export enum ActionTypes {
   TITLE_CHANGED = "TITLE_CHANGED",
   INPUT_UPDATED = "INPUT_UPDATED",
+  NOTE_UPDATED = "NOTE_UPDATED",
   ADD_CLICKED = "ADD_CLICKED",
   REMOVE_CLICKED = "REMOVE_CLICKED",
   PREVIEW_XML_CLICKED = "PREVIEW_XML_CLICKED",
@@ -20,6 +21,11 @@ export type TitleChangedAction = {
 
 export type InputUpdatedAction = {
   type: ActionTypes.INPUT_UPDATED;
+  payload: InputUpdate;
+};
+
+export type NoteUpdatedAction = {
+  type: ActionTypes.NOTE_UPDATED;
   payload: InputUpdate;
 };
 
@@ -46,6 +52,7 @@ export type SetXmlAction = {
 export type Actions =
   | TitleChangedAction
   | InputUpdatedAction
+  | NoteUpdatedAction
   | AddClickedAction
   | RemoveClickedAction
   | PreviewXmlCLickedAction

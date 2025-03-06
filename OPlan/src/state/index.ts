@@ -5,6 +5,7 @@ function buildNewOutline(id: string): NormalizedOutline {
   return {
     id: id,
     text: "",
+    _note: "",
     items: [],
   };
 }
@@ -30,7 +31,7 @@ export function reducer(state: OPlanState, action: Actions) {
         title: action.payload.textInput,
       };
 
-    case ActionTypes.INPUT_UPDATED:
+    case ActionTypes.INPUT_UPDATED: {
       const outlineId = action.payload.id;
       const outlineToUpdate = state.outlines[outlineId];
       outlineToUpdate.text = action.payload.textInput;
@@ -38,7 +39,16 @@ export function reducer(state: OPlanState, action: Actions) {
         ...state,
         outlines: { ...state.outlines },
       };
-
+    }
+    case ActionTypes.NOTE_UPDATED: {
+      const outlineId = action.payload.id.replace("_note", "");
+      const outlineToUpdate = state.outlines[outlineId];
+      outlineToUpdate._note = action.payload.textInput;
+      return {
+        ...state,
+        outlines: { ...state.outlines },
+      };
+    }
     case ActionTypes.ADD_CLICKED:
       const outlineToAddChild = state.outlines[action.payload];
       const newId = calculateNewId(outlineToAddChild);
