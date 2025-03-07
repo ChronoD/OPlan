@@ -26,10 +26,11 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
   }
   function onRemoveClicked(id: string) {
     return () => {
-      dispatch({
-        type: ActionTypes.REMOVE_CLICKED,
-        payload: id,
-      });
+      if (id !== "01")
+        dispatch({
+          type: ActionTypes.REMOVE_CLICKED,
+          payload: id,
+        });
     };
   }
 
@@ -58,21 +59,6 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     }
   }
 
-  const styles = {
-    container: {
-      display: "flex",
-      flexWrap: "wrap",
-    },
-    textField: {
-      width: 300,
-      margin: 100,
-    },
-    //style for font size
-    resize: {
-      fontSize: 50,
-    },
-  };
-
   return (
     <>
       <div
@@ -92,13 +78,21 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
               paddingLeft: "12px",
             }}
           >
-            <IconButton
-              style={{ padding: 0 }}
-              color="secondary"
-              onClick={onRemoveClicked(outline.id)}
-            >
-              <RemoveIcon />
-            </IconButton>
+            {outline.id !== "01" && outline.subs.length === 0 && (
+              <IconButton
+                style={{ padding: 0 }}
+                color="secondary"
+                onClick={onRemoveClicked(outline.id)}
+              >
+                <RemoveIcon />
+              </IconButton>
+            )}
+            {outline.id === "01" ||
+              (outline.subs.length !== 0 && (
+                <IconButton disabled style={{ padding: 0 }} color="secondary">
+                  <RemoveIcon />
+                </IconButton>
+              ))}
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <TextareaAutosize
                 style={{

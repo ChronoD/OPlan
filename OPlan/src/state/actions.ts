@@ -1,6 +1,5 @@
 // Define action types as an enum to ensure consistency and prevent typos
 export enum ActionTypes {
-  TITLE_CHANGED = "TITLE_CHANGED",
   INPUT_UPDATED = "INPUT_UPDATED",
   NOTE_UPDATED = "NOTE_UPDATED",
   ADD_CLICKED = "ADD_CLICKED",
@@ -12,11 +11,6 @@ export enum ActionTypes {
 type InputUpdate = {
   textInput: string;
   id: string;
-};
-
-export type TitleChangedAction = {
-  type: ActionTypes.TITLE_CHANGED;
-  payload: InputUpdate;
 };
 
 export type InputUpdatedAction = {
@@ -50,7 +44,6 @@ export type SetXmlAction = {
 
 // Define a union type Actions to represent all possible action types
 export type Actions =
-  | TitleChangedAction
   | InputUpdatedAction
   | NoteUpdatedAction
   | AddClickedAction

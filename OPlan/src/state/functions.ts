@@ -1,6 +1,6 @@
 import { OutlineMap, Outline } from "./types";
 
-export function denormalize(norm: OutlineMap): Outline[] {
+export function denormalize(norm: OutlineMap): Outline {
   // make Trees with no children
   const treeHash: Record<string, Outline> = Object.fromEntries(
     Object.entries(norm).map(([k, v]) => [k, { ...v, subs: [] }])
@@ -25,7 +25,7 @@ export function denormalize(norm: OutlineMap): Outline[] {
         parentlessTreeIds.length +
         " parentless trees, but there should be exactly 1"
     );
-  return [treeHash[parentlessTreeIds[0]]];
+  return treeHash[parentlessTreeIds[0]];
 }
 
 export function normalize(tree: Outline): OutlineMap {
