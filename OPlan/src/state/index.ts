@@ -10,9 +10,24 @@ function buildNewOutline(id: string): NormalizedOutline {
   };
 }
 
+function buildNewOutlineWithChild(
+  id: string,
+  childId: string
+): NormalizedOutline {
+  return {
+    id: id,
+    text: "",
+    _note: "",
+    items: [childId],
+  };
+}
+
 export const initialState: OPlanState = {
   title: "Title",
-  outlines: { ["0"]: buildNewOutline("0") },
+  outlines: {
+    ["0"]: buildNewOutlineWithChild("0", "01"),
+    ["01"]: buildNewOutline("01"),
+  },
   showXml: true,
 };
 
@@ -25,12 +40,6 @@ function calculateNewId(outline: NormalizedOutline): string {
 
 export function reducer(state: OPlanState, action: Actions) {
   switch (action.type) {
-    case ActionTypes.TITLE_CHANGED:
-      return {
-        ...state,
-        title: action.payload.textInput,
-      };
-
     case ActionTypes.INPUT_UPDATED: {
       const outlineId = action.payload.id;
       const outlineToUpdate = state.outlines[outlineId];

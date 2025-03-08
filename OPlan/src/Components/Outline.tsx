@@ -26,10 +26,11 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
   }
   function onRemoveClicked(id: string) {
     return () => {
-      dispatch({
-        type: ActionTypes.REMOVE_CLICKED,
-        payload: id,
-      });
+      if (id !== "01")
+        dispatch({
+          type: ActionTypes.REMOVE_CLICKED,
+          payload: id,
+        });
     };
   }
 
@@ -58,21 +59,6 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     }
   }
 
-  const styles = {
-    container: {
-      display: "flex",
-      flexWrap: "wrap",
-    },
-    textField: {
-      width: 300,
-      margin: 100,
-    },
-    //style for font size
-    resize: {
-      fontSize: 50,
-    },
-  };
-
   return (
     <>
       <div
@@ -95,6 +81,7 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
             <IconButton
               style={{ padding: 0 }}
               color="secondary"
+              disabled={outline.id === "01" || outline.subs.length !== 0}
               onClick={onRemoveClicked(outline.id)}
             >
               <RemoveIcon />

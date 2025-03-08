@@ -1,5 +1,4 @@
 export type OPlanState = {
-  title: string;
   outlines: OutlineMap;
   showXml: boolean;
 };

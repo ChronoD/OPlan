@@ -28,20 +28,19 @@ import { JsonForXml, OPlanState } from "../state/types";
 function Panel() {
   const { state, dispatch } = useAppContext();
 
-  function onTitleUpdate(event: ChangeEvent) {
+  function onInputUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
     dispatch({
-      type: ActionTypes.TITLE_CHANGED,
+      type: ActionTypes.INPUT_UPDATED,
       payload: { textInput: event.target.value, id: event.target.id },
     });
   }
 
-  function onAddClicked(id: string, index: number) {
+  function onAddClicked(id: string) {
     return () => {
       dispatch({
         type: ActionTypes.ADD_CLICKED,
         payload: id,
       });
-      handleKeyPress(index);
     };
   }
 
@@ -51,13 +50,13 @@ function Panel() {
     });
   }
 
-  const outlines = denormalize(state.outlines);
+  const outline = denormalize(state.outlines);
 
   function stateToXmlJson(state: OPlanState): JsonForXml {
     return {
       opml: {
-        head: { title: state.title },
-        body: { subs: outlines },
+        head: { title: outline.text || "" },
+        body: { subs: [outline] },
       },
     };
   }
@@ -77,18 +76,19 @@ function Panel() {
           }}
         >
           <TextareaAutosize
-            style={{ minHeight: "20px", width: "300px", fontSize: "22px" }}
+            style={{ minHeight: "30px", width: "300px", fontSize: "22px" }}
             aria-label="Title"
-            placeholder=">"
-            value={state.title}
-            onChange={onTitleUpdate}
+            placeholder="Title"
+            value={outline.text}
+            id={outline.id}
+            onChange={onInputUpdate}
           />
           <div style={{ padding: "5px" }}>
-            {outlines &&
-              outlines.map((out, index) => (
+            {outline.subs &&
+              outline.subs.map((out) => (
                 <OutlineComponent
                   outline={out}
-                  addSibling={onAddClicked(out.id, index)}
+                  addSibling={onAddClicked(out.id.substring(0, 1))}
                   key={out.id}
                 />
               ))}
