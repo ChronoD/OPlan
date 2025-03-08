@@ -78,21 +78,14 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
               paddingLeft: "12px",
             }}
           >
-            {outline.id !== "01" && outline.subs.length === 0 && (
-              <IconButton
-                style={{ padding: 0 }}
-                color="secondary"
-                onClick={onRemoveClicked(outline.id)}
-              >
-                <RemoveIcon />
-              </IconButton>
-            )}
-            {outline.id === "01" ||
-              (outline.subs.length !== 0 && (
-                <IconButton disabled style={{ padding: 0 }} color="secondary">
-                  <RemoveIcon />
-                </IconButton>
-              ))}
+            <IconButton
+              style={{ padding: 0 }}
+              color="secondary"
+              disabled={outline.id === "01" || outline.subs.length !== 0}
+              onClick={onRemoveClicked(outline.id)}
+            >
+              <RemoveIcon />
+            </IconButton>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <TextareaAutosize
                 style={{

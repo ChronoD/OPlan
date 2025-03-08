@@ -55,7 +55,7 @@ function Panel() {
   function stateToXmlJson(state: OPlanState): JsonForXml {
     return {
       opml: {
-        head: { title: state.title },
+        head: { title: outline.text || "" },
         body: { subs: [outline] },
       },
     };
@@ -78,7 +78,7 @@ function Panel() {
           <TextareaAutosize
             style={{ minHeight: "30px", width: "300px", fontSize: "22px" }}
             aria-label="Title"
-            placeholder=">"
+            placeholder="Title"
             value={outline.text}
             id={outline.id}
             onChange={onInputUpdate}

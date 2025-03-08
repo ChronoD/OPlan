@@ -59,7 +59,6 @@ export function reducer(state: OPlanState, action: Actions) {
       };
     }
     case ActionTypes.ADD_CLICKED:
-      console.log(action.payload);
       const outlineToAddChild = state.outlines[action.payload];
       const newId = calculateNewId(outlineToAddChild);
       state.outlines[action.payload] = {
