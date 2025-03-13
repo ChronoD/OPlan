@@ -1,6 +1,8 @@
 export type OPlanState = {
   outlines: OutlineMap;
   showXml: boolean;
+  importXml: string | null;
+  importEnabled: boolean;
 };
 
 export interface OutlineMap {
@@ -22,6 +24,13 @@ export interface Outline {
 }
 
 export type JsonForXml = {
+  opml: {
+    head: { title: string };
+    body: { subs: Outline[] };
+  };
+};
+
+export type OpmlJson = {
   opml: {
     head: { title: string };
     body: { subs: Outline[] };
