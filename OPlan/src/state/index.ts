@@ -1,5 +1,7 @@
+import { normalize, unbeautifyXml } from "./functions";
 import { ActionTypes, Actions } from "./actions";
 import { NormalizedOutline, OPlanState } from "./types";
+import opml from "opml";
 
 function buildNewOutline(id: string): NormalizedOutline {
   return {
@@ -23,12 +25,13 @@ function buildNewOutlineWithChild(
 }
 
 export const initialState: OPlanState = {
-  title: "Title",
   outlines: {
     ["0"]: buildNewOutlineWithChild("0", "01"),
     ["01"]: buildNewOutline("01"),
   },
   showXml: true,
+  importXml: null,
+  importEnabled: true,
 };
 
 function calculateNewId(outline: NormalizedOutline): string {
@@ -100,7 +103,31 @@ export function reducer(state: OPlanState, action: Actions) {
         outlines: { ...state.outlines },
       };
     }
-
+    case ActionTypes.IMPORT_XML_ADDED: {
+      return {
+        ...state,
+        importXml: unbeautifyXml(action.payload),
+        importEnabled: true,
+      };
+    }
+    case ActionTypes.IMPORT_OPML_CLICKED: {
+      let stateAfter = state;
+      opml.parse(stateAfter.importXml, (error, parseResult) => {
+        if (error !== undefined) {
+          stateAfter = { ...state, importEnabled: false };
+        } else {
+          stateAfter = {
+            ...state,
+            outlines: normalize(parseResult.opml.body.subs[0]),
+            importXml: null,
+            importEnabled: true,
+          };
+        }
+      });
+      return {
+        ...stateAfter,
+      };
+    }
     case ActionTypes.PREVIEW_XML_CLICKED: {
       return { ...state, showXml: !state.showXml };
     }

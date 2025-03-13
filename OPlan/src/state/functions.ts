@@ -28,14 +28,23 @@ export function denormalize(norm: OutlineMap): Outline {
   return treeHash[parentlessTreeIds[0]];
 }
 
-export function normalize(tree: Outline): OutlineMap {
+export function normalize(outline: Outline): OutlineMap {
+  const isSubsDefined = outline.subs !== undefined;
+  const outlinesRecursive = isSubsDefined ? outline.subs.map(normalize) : [];
   return Object.assign(
     {
-      [tree.id]: {
-        ...tree,
-        items: tree.subs.map((v) => v.id),
+      [outline.id]: {
+        ...outline,
+        items: isSubsDefined ? outline.subs.map((v) => v.id) : [],
+        subs: isSubsDefined ? outline.subs : [],
       },
     },
-    ...tree.subs.map(normalize)
+    ...outlinesRecursive
   );
+}
+
+export function unbeautifyXml(xml: string) {
+  xml = xml.replace(/>\s*/g, ">"); // Replace "> " with ">"
+  xml = xml.replace(/\s*</g, "<"); // Replace "< " with "<"
+  return xml;
 }
