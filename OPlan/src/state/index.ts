@@ -1,6 +1,12 @@
-import { normalize, unbeautifyXml } from "./functions";
+import { normalize, normalizeMultiple, unbeautifyXml } from "./functions";
 import { ActionTypes, Actions } from "./actions";
-import { NormalizedOutline, OPlanState } from "./types";
+import {
+  NormalizedOutline,
+  OPlanState,
+  Outline,
+  OutlineMap,
+  OutlineRaw,
+} from "./types";
 import opml from "opml";
 
 function buildNewOutline(id: string): NormalizedOutline {
@@ -26,8 +32,9 @@ function buildNewOutlineWithChild(
 
 export const initialState: OPlanState = {
   outlines: {
-    ["0"]: buildNewOutlineWithChild("0", "01"),
-    ["01"]: buildNewOutline("01"),
+    // ["0"]: buildNewOutlineWithChild("0", "01"),
+    // ["01"]: buildNewOutline("01"),
+    ["1"]: buildNewOutline("1"),
   },
   showXml: true,
   importXml: null,
@@ -39,6 +46,23 @@ function calculateNewId(outline: NormalizedOutline): string {
     return (outline.id + 1).toString();
   }
   return (outline.id + (outline.items.length + 1)).toString();
+}
+
+function addIds(outline: OutlineRaw, indexStart: string): any {
+  if (!outline.id) {
+    outline.id = indexStart;
+  }
+  return {
+    ...outline,
+    subs: outline.subs
+      ? outline.subs.map((s, index) => addIds(s, indexStart + index))
+      : [],
+    items: outline.subs ? outline.subs.map((sub) => sub.id) : [],
+  };
+}
+
+function addIdsMultiple(outlines: OutlineRaw[]): OutlineRaw[] {
+  return outlines.map((outline, index) => addIds(outline, index.toString()));
 }
 
 export function reducer(state: OPlanState, action: Actions) {
@@ -62,6 +86,8 @@ export function reducer(state: OPlanState, action: Actions) {
       };
     }
     case ActionTypes.ADD_CLICKED:
+      console.log("ADD_CLICKED", action.payload);
+
       const outlineToAddChild = state.outlines[action.payload];
       const newId = calculateNewId(outlineToAddChild);
       state.outlines[action.payload] = {
@@ -116,9 +142,27 @@ export function reducer(state: OPlanState, action: Actions) {
         if (error !== undefined) {
           stateAfter = { ...state, importEnabled: false };
         } else {
+          // console.log("subs size: ", parseResult.opml.body.subs.length);
+          const multipleOutlinesWithIds = addIdsMultiple(
+            parseResult.opml.body.subs
+          );
+          console.log("multipleOutlinesWithIds: ", multipleOutlinesWithIds);
+
+          const normalizedMultiples = normalizeMultiple(
+            multipleOutlinesWithIds as Outline[]
+          );
+          console.log("normalizedMultiples: ", normalizedMultiples);
+
+          // console.log("normalizedMultiples: ", normalizedMultiples);
+          // console.log(
+          //   "json: ",
+          //   JSON.stringify(parseResult.opml.body.subs[0], null, "\t")
+          // );
+          let enrichedOutline = parseResult.opml.body.subs[0];
+          enrichedOutline = addIds(enrichedOutline, "0");
           stateAfter = {
             ...state,
-            outlines: normalize(parseResult.opml.body.subs[0]),
+            outlines: normalizedMultiples,
             importXml: null,
             importEnabled: true,
           };

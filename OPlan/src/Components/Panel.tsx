@@ -75,14 +75,16 @@ function Panel() {
       type: ActionTypes.IMPORT_OPML_CLICKED,
     });
   }
+  console.log("state.outlines", state.outlines);
 
-  const outline = denormalize(state.outlines);
+  const outlines = denormalize(state.outlines);
+  console.log("outlines", outlines);
 
   function stateToXmlJson(state: OPlanState): JsonForXml {
     return {
       opml: {
-        head: { title: outline.text || "" },
-        body: { subs: [outline] },
+        head: { title: "" },
+        body: { subs: outlines },
       },
     };
   }
@@ -105,7 +107,7 @@ function Panel() {
             justifyContent: "flex-start",
           }}
         >
-          <TextareaAutosize
+          {/* <TextareaAutosize
             style={{
               minHeight: "30px",
               width: "300px",
@@ -114,19 +116,22 @@ function Panel() {
             }}
             aria-label="Title"
             placeholder="Title"
-            value={outline.text}
-            id={outline.id}
+            value={outline[0].text}
+            id={outline[0].id}
             onChange={onInputUpdate}
-          />
+          /> */}
           <div style={{ padding: "5px" }}>
-            {outline.subs &&
-              outline.subs.map((out) => (
-                <OutlineComponent
-                  outline={out}
-                  addSibling={onAddClicked(out.id.substring(0, 1))}
-                  key={out.id}
-                />
-              ))}
+            {outlines &&
+              outlines.map((out) => {
+                console.log("out", out);
+                return (
+                  <OutlineComponent
+                    outline={out}
+                    addSibling={onAddClicked(out.id)}
+                    key={out.id}
+                  />
+                );
+              })}
           </div>
         </Grid2>
         <Grid2 size={{ xs: 6, md: 4 }}>

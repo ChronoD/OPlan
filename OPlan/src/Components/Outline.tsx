@@ -59,6 +59,9 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     }
   }
 
+  if (!outline || !outline.subs) {
+    // console.log(outline);
+  }
   return (
     <>
       <div

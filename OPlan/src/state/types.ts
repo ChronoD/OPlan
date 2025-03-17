@@ -16,6 +16,13 @@ export interface NormalizedOutline {
   items: string[];
 }
 
+export interface OutlineRaw {
+  id: string | undefined;
+  text: string | undefined;
+  _note: string | undefined;
+  subs: Outline[];
+}
+
 export interface Outline {
   id: string;
   text: string | undefined;
