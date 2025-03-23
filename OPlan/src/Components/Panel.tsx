@@ -12,31 +12,29 @@ import {
   FormGroup,
   FormControlLabel,
   Button,
-  TextField,
   Box,
   IconButton,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
-import { JsonForXml, OPlanState } from "../state/types";
+import { JsonForXml } from "../state/types";
 import UploadIcon from "@mui/icons-material/Upload";
+
+// function parse(opmltext, useJson) {
+//   if (opmltext !== undefined) {
+//     opml.parse(opmltext, (error, parseResult) => {
+//       useJson(parseResult);
+//     });
+//   }
+// }
 
 function Panel() {
   const { state, dispatch } = useAppContext();
 
-  function onInputUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
+  function onTitleUpdate(event: ChangeEvent) {
     dispatch({
-      type: ActionTypes.INPUT_UPDATED,
+      type: ActionTypes.TITLE_CHANGED,
       payload: { textInput: event.target.value, id: event.target.id },
     });
-  }
-
-  function onAddClicked(id: string) {
-    return () => {
-      dispatch({
-        type: ActionTypes.ADD_CLICKED,
-        payload: id,
-      });
-    };
   }
 
   function onShowPreviewClicked() {
@@ -75,15 +73,13 @@ function Panel() {
       type: ActionTypes.IMPORT_OPML_CLICKED,
     });
   }
-  console.log("state.outlines", state.outlines);
 
   const outlines = denormalize(state.outlines);
-  console.log("outlines", outlines);
 
-  function stateToXmlJson(state: OPlanState): JsonForXml {
+  function stateToXmlJson(): JsonForXml {
     return {
       opml: {
-        head: { title: "" },
+        head: { title: state.title },
         body: { subs: outlines },
       },
     };
@@ -93,21 +89,26 @@ function Panel() {
     navigator.clipboard.writeText(xml);
   }
 
-  const json = stateToXmlJson(state);
+  const json = stateToXmlJson();
   const xml = json ? opml.stringify(json) : null;
   const file = new Blob([xml], { type: "text/plain" });
   return (
-    <>
-      <Grid2 container spacing={2} style={{ height: "101vh" }}>
+    <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
+      <Grid2
+        container
+        spacing={2}
+        style={{ height: "140vh", backgroundColor: "rgb(176, 173, 173)" }}
+      >
         <Grid2
           size={{ xs: 6, md: 8 }}
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
+            backgroundColor: "rgb(176, 173, 173)",
           }}
         >
-          {/* <TextareaAutosize
+          <TextareaAutosize
             style={{
               minHeight: "30px",
               width: "300px",
@@ -116,25 +117,30 @@ function Panel() {
             }}
             aria-label="Title"
             placeholder="Title"
-            value={outline[0].text}
-            id={outline[0].id}
-            onChange={onInputUpdate}
-          /> */}
+            value={state.title || ""}
+            onChange={onTitleUpdate}
+          />
           <div style={{ padding: "5px" }}>
             {outlines &&
-              outlines.map((out) => {
-                console.log("out", out);
-                return (
+              outlines
+                .sort(
+                  (o1, o2) =>
+                    state.topOutlineOrder.indexOf(Number(o1.id)) -
+                    state.topOutlineOrder.indexOf(Number(o2.id))
+                )
+                .map((out) => (
                   <OutlineComponent
                     outline={out}
-                    addSibling={onAddClicked(out.id)}
                     key={out.id}
+                    parentOutlineId={null}
                   />
-                );
-              })}
+                ))}
           </div>
         </Grid2>
-        <Grid2 size={{ xs: 6, md: 4 }}>
+        <Grid2
+          size={{ xs: 6, md: 4 }}
+          style={{ backgroundColor: " rgb(176, 173, 173)" }}
+        >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <input
@@ -236,7 +242,7 @@ function Panel() {
           value={json && JSON.stringify(json, null, 2)}
         /> */}
       </Grid2>
-    </>
+    </div>
   );
 }
 

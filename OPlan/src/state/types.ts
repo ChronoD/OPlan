@@ -3,6 +3,8 @@ export type OPlanState = {
   showXml: boolean;
   importXml: string | null;
   importEnabled: boolean;
+  topOutlineOrder: Number[];
+  title: string;
 };
 
 export interface OutlineMap {
@@ -27,6 +29,7 @@ export interface Outline {
   id: string;
   text: string | undefined;
   _note: string | undefined;
+  items: string[];
   subs: Outline[];
 }
 
