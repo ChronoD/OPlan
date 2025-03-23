@@ -15,7 +15,7 @@ import {
   Box,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
-import { JsonForXml, OPlanState } from "../state/types";
+import { JsonForXml, Outline } from "../state/types";
 
 // function parse(opmltext, useJson) {
 //   if (opmltext !== undefined) {
@@ -28,20 +28,11 @@ import { JsonForXml, OPlanState } from "../state/types";
 function Panel() {
   const { state, dispatch } = useAppContext();
 
-  function onInputUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
+  function onTitleUpdate(event: ChangeEvent) {
     dispatch({
-      type: ActionTypes.INPUT_UPDATED,
+      type: ActionTypes.TITLE_CHANGED,
       payload: { textInput: event.target.value, id: event.target.id },
     });
-  }
-
-  function onAddClicked(id: string) {
-    return () => {
-      dispatch({
-        type: ActionTypes.ADD_CLICKED,
-        payload: id,
-      });
-    };
   }
 
   function onShowPreviewClicked() {
@@ -50,51 +41,64 @@ function Panel() {
     });
   }
 
-  const outline = denormalize(state.outlines);
+  const outlines: Outline[] = denormalize(state.outlines);
 
-  function stateToXmlJson(state: OPlanState): JsonForXml {
+  function stateToXmlJson(): JsonForXml {
     return {
       opml: {
-        head: { title: outline.text || "" },
-        body: { subs: [outline] },
+        head: { title: state.title },
+        body: { subs: outlines },
       },
     };
   }
 
-  const json = stateToXmlJson(state);
+  const json = stateToXmlJson();
   const xml = json ? opml.stringify(json) : null;
   const file = new Blob([xml], { type: "text/plain" });
   return (
-    <>
-      <Grid2 container spacing={2} style={{ height: "101vh" }}>
+    <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
+      <Grid2
+        container
+        spacing={2}
+        style={{ height: "140vh", backgroundColor: "rgb(176, 173, 173)" }}
+      >
         <Grid2
           size={{ xs: 6, md: 8 }}
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
+            backgroundColor: "rgb(176, 173, 173)",
           }}
         >
           <TextareaAutosize
             style={{ minHeight: "30px", width: "300px", fontSize: "22px" }}
             aria-label="Title"
             placeholder="Title"
-            value={outline.text}
-            id={outline.id}
-            onChange={onInputUpdate}
+            value={state.title || ""}
+            onChange={onTitleUpdate}
           />
           <div style={{ padding: "5px" }}>
-            {outline.subs &&
-              outline.subs.map((out) => (
-                <OutlineComponent
-                  outline={out}
-                  addSibling={onAddClicked(out.id.substring(0, 1))}
-                  key={out.id}
-                />
-              ))}
+            {outlines &&
+              outlines
+                .sort(
+                  (o1, o2) =>
+                    state.topOutlineOrder.indexOf(Number(o1.id)) -
+                    state.topOutlineOrder.indexOf(Number(o2.id))
+                )
+                .map((out) => (
+                  <OutlineComponent
+                    outline={out}
+                    key={out.id}
+                    parentOutlineId={null}
+                  />
+                ))}
           </div>
         </Grid2>
-        <Grid2 size={{ xs: 6, md: 4 }}>
+        <Grid2
+          size={{ xs: 6, md: 4 }}
+          style={{ backgroundColor: " rgb(176, 173, 173)" }}
+        >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Button
@@ -171,7 +175,7 @@ function Panel() {
           value={json && JSON.stringify(json, null, 2)}
         /> */}
       </Grid2>
-    </>
+    </div>
   );
 }
 
