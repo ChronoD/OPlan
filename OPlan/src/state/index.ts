@@ -183,32 +183,24 @@ export function reducer(state: OPlanState, action: Actions) {
         if (error !== undefined) {
           stateAfter = { ...state, importEnabled: false };
         } else {
-          // console.log("subs size: ", parseResult.opml.body.subs.length);
-          const multipleOutlinesWithIds = addIdsMultiple(
+          const outlinesTreeWithIds = addIdsMultiple(
             parseResult.opml.body.subs
           );
-          console.log("multipleOutlinesWithIds: ", multipleOutlinesWithIds);
-
-          const normalizedMultiples = multipleOutlinesWithIds.map(normalize);
-          var object = normalizedMultiples.reduce((obj, item) => {
-            console.log(item);
-            return Object.assign(obj, { [item.id.toString()]: item }), {};
-          });
-
-          console.log(object);
-
-          console.log("normalizedMultiples: ", normalizedMultiples);
-
-          // console.log("normalizedMultiples: ", normalizedMultiples);
-          // console.log(
-          //   "json: ",
-          //   JSON.stringify(parseResult.opml.body.subs[0], null, "\t")
-          // );
+          const normalizedMultiples = outlinesTreeWithIds.map(normalize);
+          const outlinesMap = new Object();
+          normalizedMultiples.map((outlineKeyValue) =>
+            Object.entries(outlineKeyValue).map((outMap) => {
+              return Object.assign(outlinesMap, {
+                [outMap[0].toString()]: outMap[1],
+              });
+            })
+          );
           let enrichedOutline = parseResult.opml.body.subs[0];
           enrichedOutline = addIds(enrichedOutline, "0");
           stateAfter = {
             ...state,
-            outlines: normalizedMultiples,
+            outlines: outlinesMap as any as OutlineMap,
+            title: parseResult.opml.head.title,
             importXml: null,
             importEnabled: true,
           };

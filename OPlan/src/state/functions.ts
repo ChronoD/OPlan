@@ -23,7 +23,7 @@ export function denormalize(norm: OutlineMap): Outline[] {
 export function normalize(outline: Outline): OutlineMap {
   const isSubsDefined = outline.subs !== undefined;
   const outlinesRecursive = isSubsDefined ? outline.subs.map(normalize) : [];
-  return Object.assign(
+  const resp = Object.assign(
     {
       [outline.id]: {
         ...outline,
@@ -33,6 +33,7 @@ export function normalize(outline: Outline): OutlineMap {
     },
     ...outlinesRecursive
   );
+  return resp;
 }
 
 export function unbeautifyXml(xml: string) {

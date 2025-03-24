@@ -67,9 +67,6 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
     }
   }
 
-  if (!outline || !outline.subs) {
-    // console.log(outline);
-  }
   return (
     <>
       <div
