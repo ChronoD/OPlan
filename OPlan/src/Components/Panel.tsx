@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, ChangeEventHandler } from "react";
 import "../App.css";
 import opml from "opml";
 import { useAppContext } from "../state/useAppContext";
@@ -13,17 +13,11 @@ import {
   FormControlLabel,
   Button,
   Box,
+  IconButton,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
-import { JsonForXml, Outline } from "../state/types";
-
-// function parse(opmltext, useJson) {
-//   if (opmltext !== undefined) {
-//     opml.parse(opmltext, (error, parseResult) => {
-//       useJson(parseResult);
-//     });
-//   }
-// }
+import { JsonForXml } from "../state/types";
+import UploadIcon from "@mui/icons-material/Upload";
 
 function Panel() {
   const { state, dispatch } = useAppContext();
@@ -41,7 +35,38 @@ function Panel() {
     });
   }
 
-  const outlines: Outline[] = denormalize(state.outlines);
+  function onImportXmlFileAdded(e: ChangeEventHandler<HTMLInputElement>) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        dispatch({
+          type: ActionTypes.IMPORT_XML_ADDED,
+          payload: e.target.result,
+        });
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  function onImportXmlAdded(
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ): void {
+    dispatch({
+      type: ActionTypes.IMPORT_XML_ADDED,
+      payload: e.target.value,
+    });
+  }
+
+  function onImportClicked(
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ): void {
+    dispatch({
+      type: ActionTypes.IMPORT_OPML_CLICKED,
+    });
+  }
+
+  const outlines = denormalize(state.outlines);
 
   function stateToXmlJson(): JsonForXml {
     return {
@@ -50,6 +75,10 @@ function Panel() {
         body: { subs: outlines },
       },
     };
+  }
+
+  function copyToClipboad() {
+    navigator.clipboard.writeText(xml);
   }
 
   const json = stateToXmlJson();
@@ -72,7 +101,12 @@ function Panel() {
           }}
         >
           <TextareaAutosize
-            style={{ minHeight: "30px", width: "300px", fontSize: "22px" }}
+            style={{
+              minHeight: "30px",
+              width: "300px",
+              fontSize: "22px",
+              backgroundColor: "#527DA1",
+            }}
             aria-label="Title"
             placeholder="Title"
             value={state.title || ""}
@@ -101,15 +135,44 @@ function Panel() {
         >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <input
+                type="file"
+                id="file"
+                className="input-file"
+                accept=".opml"
+                onChange={onImportXmlFileAdded}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginBottom: "12px",
+                }}
+              >
+                <TextareaAutosize
+                  style={{
+                    padding: 5,
+                    width: "300px",
+                  }}
+                  value={state.importXml || ""}
+                  onChange={onImportXmlAdded}
+                />
+                <IconButton
+                  style={{ padding: 0 }}
+                  disabled={!state.importEnabled}
+                  color="secondary"
+                  onClick={onImportClicked}
+                >
+                  <UploadIcon />
+                </IconButton>
+              </Box>
               <Button
                 sx={{
                   width: "200px",
                   marginBottom: "12px",
                   borderRadius: "50px",
                 }}
-                onClick={() => {
-                  navigator.clipboard.writeText(xml);
-                }}
+                onClick={copyToClipboad}
                 variant="outlined"
               >
                 Copy to Clipboard
@@ -149,31 +212,11 @@ function Panel() {
               />
             </FormGroup>
 
-            {state.showXml && <Preview xml={xml} />}
+            {state.showXml && (
+              <Preview xml={xml} copyToClipboad={copyToClipboad} />
+            )}
           </Grid2>
         </Grid2>
-        {/* <input
-          type="file"
-          id="file"
-          className="input-file"
-          accept=".opml"
-          onChange={(e) => handleFileChosen(e.target.files[0])}
-        /> */}
-        {/* <OutlineComponent outline={context.state} /> */}
-        {/*
-        <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && opml.stringify(json)}
-        />
-       */}
-        {/* <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && JSON.stringify(json, null, 2)}
-        /> */}
       </Grid2>
     </div>
   );

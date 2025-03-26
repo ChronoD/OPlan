@@ -1,5 +1,7 @@
+import { normalize, unbeautifyXml } from "./functions";
 import { ActionTypes, Actions } from "./actions";
-import { NormalizedOutline, OPlanState, OutlineMap } from "./types";
+import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
+import opml from "opml";
 
 function buildNewOutline(id: string): NormalizedOutline {
   return {
@@ -25,16 +27,15 @@ function buildNewOutlineWithChild(
 export const initialState: OPlanState = {
   outlines: {
     ["1"]: buildNewOutline("1"),
-    // ["1"]: buildNewOutline("1"),
     // ["3"]: buildNewOutlineWithChild("3", "31"),
     // ["31"]: buildNewOutline("31"),
   },
   showXml: true,
   topOutlineOrder: [1],
-  title: null,
+  title: "",
+  importXml: null,
+  importEnabled: true,
 };
-
-// function getOutlineSiblingsCount(id: string, outlines: OutlineMap) {}
 
 function calculateNewId(outlines: OutlineMap): string {
   const outlineIds = Object.keys(outlines).sort(
@@ -43,6 +44,23 @@ function calculateNewId(outlines: OutlineMap): string {
   const lastId = outlineIds.pop();
   const nextId = lastId ? Number(lastId) + 1 : 0;
   return nextId.toString();
+}
+
+function addIds(outline: OutlineRaw, indexStart: string): any {
+  if (!outline.id) {
+    outline.id = indexStart;
+  }
+  return {
+    ...outline,
+    subs: outline.subs
+      ? outline.subs.map((s, index) => addIds(s, indexStart + index))
+      : [],
+    items: outline.subs ? outline.subs.map((sub) => sub.id) : [],
+  };
+}
+
+function addIdsMultiple(outlines: OutlineRaw[]): OutlineRaw[] {
+  return outlines.map((outline, index) => addIds(outline, index.toString()));
 }
 
 export function reducer(state: OPlanState, action: Actions) {
@@ -143,7 +161,47 @@ export function reducer(state: OPlanState, action: Actions) {
         outlines: { ...state.outlines },
       };
     }
-
+    case ActionTypes.IMPORT_XML_ADDED: {
+      return {
+        ...state,
+        importXml: unbeautifyXml(action.payload),
+        importEnabled: true,
+      };
+    }
+    case ActionTypes.IMPORT_OPML_CLICKED: {
+      let stateAfter = state;
+      opml.parse(stateAfter.importXml, (error, parseResult) => {
+        if (error !== undefined) {
+          console.log("error parsing opml: ", error);
+          stateAfter = { ...state, importEnabled: false };
+        } else {
+          const outlinesTreeWithIds = addIdsMultiple(
+            parseResult.opml.body.subs
+          );
+          const normalizedMultiples = outlinesTreeWithIds.map(normalize);
+          const outlinesMap = new Object();
+          normalizedMultiples.map((outlineKeyValue) =>
+            Object.entries(outlineKeyValue).map((outMap) => {
+              return Object.assign(outlinesMap, {
+                [outMap[0].toString()]: outMap[1],
+              });
+            })
+          );
+          let enrichedOutline = parseResult.opml.body.subs[0];
+          enrichedOutline = addIds(enrichedOutline, "0");
+          stateAfter = {
+            ...state,
+            outlines: outlinesMap as any as OutlineMap,
+            title: parseResult.opml.head.title,
+            importXml: null,
+            importEnabled: true,
+          };
+        }
+      });
+      return {
+        ...stateAfter,
+      };
+    }
     case ActionTypes.PREVIEW_XML_CLICKED: {
       return { ...state, showXml: !state.showXml };
     }
