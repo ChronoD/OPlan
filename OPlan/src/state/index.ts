@@ -10,8 +10,9 @@ function buildNewOutline(id: string): NormalizedOutline {
 }
 
 export const initialState: OPlanState = {
-  title: "Title",
   outlines: { ["0"]: buildNewOutline("0") },
+  defaultSaveName: new Date().toISOString().slice(0, -5),
+  customSaveNames: [],
   showXml: true,
 };
 

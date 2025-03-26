@@ -13,17 +13,12 @@ import {
   FormControlLabel,
   Button,
   Box,
+  IconButton,
+  Typography,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
 import { JsonForXml, OPlanState } from "../state/types";
-
-// function parse(opmltext, useJson) {
-//   if (opmltext !== undefined) {
-//     opml.parse(opmltext, (error, parseResult) => {
-//       useJson(parseResult);
-//     });
-//   }
-// }
+import SaveIcon from "@mui/icons-material/Save";
 
 function Panel() {
   const { state, dispatch } = useAppContext();
@@ -50,6 +45,8 @@ function Panel() {
       type: ActionTypes.PREVIEW_XML_CLICKED,
     });
   }
+
+  function saveToDefault(): void {}
 
   const outlines = denormalize(state.outlines);
 
@@ -97,6 +94,18 @@ function Panel() {
         <Grid2 size={{ xs: 6, md: 4 }}>
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <Typography variant="subtitle1" component="p">
+                  Last saved at: {state.defaultSaveName}
+                </Typography>
+                <IconButton
+                  style={{ padding: 0 }}
+                  color="secondary"
+                  onClick={saveToDefault()}
+                >
+                  <SaveIcon />
+                </IconButton>
+              </Box>
               <Button
                 sx={{
                   width: "200px",

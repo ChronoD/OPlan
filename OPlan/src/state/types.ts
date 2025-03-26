@@ -1,5 +1,6 @@
 export type OPlanState = {
-  title: string;
+  defaultSaveName: string;
+  customSaveNames: string[];
   outlines: OutlineMap;
   showXml: boolean;
 };
