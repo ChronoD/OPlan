@@ -100,7 +100,6 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
                   minHeight: "20px",
                   minWidth: "600px",
                   fontSize: "20px",
-                  backgroundColor: "#596169",
                 }}
                 aria-label="empty textarea"
                 placeholder=">"

@@ -19,14 +19,6 @@ import { denormalize } from "../state/functions";
 import { JsonForXml } from "../state/types";
 import UploadIcon from "@mui/icons-material/Upload";
 
-// function parse(opmltext, useJson) {
-//   if (opmltext !== undefined) {
-//     opml.parse(opmltext, (error, parseResult) => {
-//       useJson(parseResult);
-//     });
-//   }
-// }
-
 function Panel() {
   const { state, dispatch } = useAppContext();
 
@@ -225,22 +217,6 @@ function Panel() {
             )}
           </Grid2>
         </Grid2>
-
-        {/* <OutlineComponent outline={context.state} /> */}
-        {/*
-        <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && opml.stringify(json)}
-        />
-       */}
-        {/* <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && JSON.stringify(json, null, 2)}
-        /> */}
       </Grid2>
     </div>
   );

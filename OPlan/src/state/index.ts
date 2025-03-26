@@ -1,12 +1,6 @@
 import { normalize, unbeautifyXml } from "./functions";
 import { ActionTypes, Actions } from "./actions";
-import {
-  NormalizedOutline,
-  OPlanState,
-  Outline,
-  OutlineMap,
-  OutlineRaw,
-} from "./types";
+import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
 import opml from "opml";
 
 function buildNewOutline(id: string): NormalizedOutline {
@@ -33,7 +27,6 @@ function buildNewOutlineWithChild(
 export const initialState: OPlanState = {
   outlines: {
     ["1"]: buildNewOutline("1"),
-    // ["1"]: buildNewOutline("1"),
     // ["3"]: buildNewOutlineWithChild("3", "31"),
     // ["31"]: buildNewOutline("31"),
   },
@@ -43,8 +36,6 @@ export const initialState: OPlanState = {
   importXml: null,
   importEnabled: true,
 };
-
-// function getOutlineSiblingsCount(id: string, outlines: OutlineMap) {}
 
 function calculateNewId(outlines: OutlineMap): string {
   const outlineIds = Object.keys(outlines).sort(
@@ -181,6 +172,7 @@ export function reducer(state: OPlanState, action: Actions) {
       let stateAfter = state;
       opml.parse(stateAfter.importXml, (error, parseResult) => {
         if (error !== undefined) {
+          console.log("error parsing opml: ", error);
           stateAfter = { ...state, importEnabled: false };
         } else {
           const outlinesTreeWithIds = addIdsMultiple(
