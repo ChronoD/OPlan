@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, ChangeEventHandler } from "react";
 import "../App.css";
 import opml from "opml";
 import { useAppContext } from "../state/useAppContext";
@@ -17,8 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
-import { JsonForXml, OPlanState } from "../state/types";
+import { JsonForXml } from "../state/types";
 import SaveIcon from "@mui/icons-material/Save";
+import UploadIcon from "@mui/icons-material/Upload";
 
 function Panel() {
   const { state, dispatch } = useAppContext();
@@ -30,16 +31,6 @@ function Panel() {
     });
   }
 
-  function onAddClicked(id: string, index: number) {
-    return () => {
-      dispatch({
-        type: ActionTypes.ADD_CLICKED,
-        payload: id,
-      });
-      handleKeyPress(index);
-    };
-  }
-
   function onShowPreviewClicked() {
     dispatch({
       type: ActionTypes.PREVIEW_XML_CLICKED,
@@ -48,9 +39,40 @@ function Panel() {
 
   function saveToDefault(): void {}
 
+  function onImportXmlFileAdded(e: ChangeEventHandler<HTMLInputElement>) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        dispatch({
+          type: ActionTypes.IMPORT_XML_ADDED,
+          payload: e.target.result,
+        });
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  function onImportXmlAdded(
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ): void {
+    dispatch({
+      type: ActionTypes.IMPORT_XML_ADDED,
+      payload: e.target.value,
+    });
+  }
+
+  function onImportClicked(
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ): void {
+    dispatch({
+      type: ActionTypes.IMPORT_OPML_CLICKED,
+    });
+  }
+
   const outlines = denormalize(state.outlines);
 
-  function stateToXmlJson(state: OPlanState): JsonForXml {
+  function stateToXmlJson(): JsonForXml {
     return {
       opml: {
         head: { title: state.title },
@@ -59,39 +81,62 @@ function Panel() {
     };
   }
 
-  const json = stateToXmlJson(state);
+  function copyToClipboad() {
+    navigator.clipboard.writeText(xml);
+  }
+
+  const json = stateToXmlJson();
   const xml = json ? opml.stringify(json) : null;
   const file = new Blob([xml], { type: "text/plain" });
   return (
-    <>
-      <Grid2 container spacing={2} style={{ height: "101vh" }}>
+    <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
+      <Grid2
+        container
+        spacing={2}
+        style={{ height: "140vh", backgroundColor: "rgb(176, 173, 173)" }}
+      >
         <Grid2
           size={{ xs: 6, md: 8 }}
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
+            backgroundColor: "rgb(176, 173, 173)",
           }}
         >
           <TextareaAutosize
-            style={{ minHeight: "20px", width: "300px" }}
+            style={{
+              minHeight: "30px",
+              width: "300px",
+              fontSize: "22px",
+              backgroundColor: "#527DA1",
+            }}
             aria-label="Title"
-            placeholder=">"
-            value={state.title}
+            placeholder="Title"
+            value={state.title || ""}
             onChange={onTitleUpdate}
           />
           <div style={{ padding: "5px" }}>
             {outlines &&
-              outlines.map((out, index) => (
-                <OutlineComponent
-                  outline={out}
-                  addSibling={onAddClicked(out.id, index)}
-                  key={out.id}
-                />
-              ))}
+              outlines
+                .sort(
+                  (o1, o2) =>
+                    state.topOutlineOrder.indexOf(Number(o1.id)) -
+                    state.topOutlineOrder.indexOf(Number(o2.id))
+                )
+                .map((out) => (
+                  <OutlineComponent
+                    outline={out}
+                    key={out.id}
+                    parentOutlineId={null}
+                  />
+                ))}
           </div>
         </Grid2>
-        <Grid2 size={{ xs: 6, md: 4 }}>
+        <Grid2
+          size={{ xs: 6, md: 4 }}
+          style={{ backgroundColor: " rgb(176, 173, 173)" }}
+        >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -106,15 +151,44 @@ function Panel() {
                   <SaveIcon />
                 </IconButton>
               </Box>
+              <input
+                type="file"
+                id="file"
+                className="input-file"
+                accept=".opml"
+                onChange={onImportXmlFileAdded}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginBottom: "12px",
+                }}
+              >
+                <TextareaAutosize
+                  style={{
+                    padding: 5,
+                    width: "300px",
+                  }}
+                  value={state.importXml || ""}
+                  onChange={onImportXmlAdded}
+                />
+                <IconButton
+                  style={{ padding: 0 }}
+                  disabled={!state.importEnabled}
+                  color="secondary"
+                  onClick={onImportClicked}
+                >
+                  <UploadIcon />
+                </IconButton>
+              </Box>
               <Button
                 sx={{
                   width: "200px",
                   marginBottom: "12px",
                   borderRadius: "50px",
                 }}
-                onClick={() => {
-                  navigator.clipboard.writeText(xml);
-                }}
+                onClick={copyToClipboad}
                 variant="outlined"
               >
                 Copy to Clipboard
@@ -154,33 +228,13 @@ function Panel() {
               />
             </FormGroup>
 
-            {state.showXml && <Preview xml={xml} />}
+            {state.showXml && (
+              <Preview xml={xml} copyToClipboad={copyToClipboad} />
+            )}
           </Grid2>
         </Grid2>
-        {/* <input
-          type="file"
-          id="file"
-          className="input-file"
-          accept=".opml"
-          onChange={(e) => handleFileChosen(e.target.files[0])}
-        /> */}
-        {/* <OutlineComponent outline={context.state} /> */}
-        {/*
-        <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && opml.stringify(json)}
-        />
-       */}
-        {/* <TextareaAutosize
-          style={{ minHeight: "60%", width: "100%" }}
-          aria-label="empty textarea"
-          placeholder="Empty"
-          value={json && JSON.stringify(json, null, 2)}
-        /> */}
       </Grid2>
-    </>
+    </div>
   );
 }
 

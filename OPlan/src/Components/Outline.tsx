@@ -1,5 +1,5 @@
 import "../App.css";
-import { IconButton, TextareaAutosize } from "@mui/material";
+import { Box, IconButton, TextareaAutosize } from "@mui/material";
 import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
 import { ActionTypes } from "../state/actions";
@@ -9,27 +9,36 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
 
 interface OutlineProps {
-  outline: Outline | undefined;
-  addSibling: () => void;
+  outline: Outline;
+  parentOutlineId: string | null;
 }
 
-function OutlineComponent({ outline, addSibling }: OutlineProps) {
+function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
   const { dispatch } = useAppContext();
 
-  function onAddClicked(id: string) {
+  function onAddSiblingClicked() {
+    dispatch({
+      type: ActionTypes.ADD_SIBLING_CLICKED,
+      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
+    });
+  }
+
+  function onAddChildClicked(id: string) {
     return () => {
       dispatch({
-        type: ActionTypes.ADD_CLICKED,
+        type: ActionTypes.ADD_CHILD_CLICKED,
         payload: id,
       });
     };
   }
+
   function onRemoveClicked(id: string) {
     return () => {
-      dispatch({
-        type: ActionTypes.REMOVE_CLICKED,
-        payload: id,
-      });
+      if (outline.subs.length === 0)
+        dispatch({
+          type: ActionTypes.REMOVE_CLICKED,
+          payload: id,
+        });
     };
   }
 
@@ -40,14 +49,21 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
     });
   }
 
+  function onNoteUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
+    dispatch({
+      type: ActionTypes.NOTE_UPDATED,
+      payload: { textInput: event.target.value, id: event.target.id },
+    });
+  }
+
   function onKeyDown(event: KeyboardEventHandler<HTMLTextAreaElement>) {
     if (event.key === "Enter") {
       event.preventDefault();
-      addSibling();
+      onAddSiblingClicked();
     }
     if (event.key === "Tab") {
       event.preventDefault();
-      onAddClicked(outline.id)();
+      onAddChildClicked(outline.id)();
     }
   }
 
@@ -73,25 +89,45 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
             <IconButton
               style={{ padding: 0 }}
               color="secondary"
+              disabled={outline.subs.length !== 0}
               onClick={onRemoveClicked(outline.id)}
             >
               <RemoveIcon />
             </IconButton>
-            <TextareaAutosize
-              style={{ minHeight: "20px", minWidth: "600px" }}
-              aria-label="empty textarea"
-              placeholder=">"
-              value={outline.text}
-              id={outline.id}
-              onChange={onInputUpdate}
-              onKeyDown={onKeyDown}
-            />
-            <IconButton style={{ padding: 0 }} onClick={addSibling}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <TextareaAutosize
+                style={{
+                  minHeight: "20px",
+                  minWidth: "600px",
+                  fontSize: "20px",
+                }}
+                aria-label="empty textarea"
+                placeholder=">"
+                value={outline.text}
+                id={outline.id}
+                onChange={onInputUpdate}
+                onKeyDown={onKeyDown}
+              />
+              <TextareaAutosize
+                style={{
+                  width: "600px",
+                  background: "#6d7271",
+                  fontSize: "16px",
+                }}
+                aria-label="empty textarea"
+                placeholder=""
+                value={outline._note}
+                id={outline.id + "_note"}
+                onChange={onNoteUpdate}
+                onKeyDown={onKeyDown}
+              />
+            </Box>
+            <IconButton style={{ padding: 0 }} onClick={onAddSiblingClicked}>
               <AddIcon />
             </IconButton>
             <IconButton
               style={{ padding: 0 }}
-              onClick={onAddClicked(outline.id)}
+              onClick={onAddChildClicked(outline.id)}
             >
               <SubdirectoryArrowRightIcon />
             </IconButton>
@@ -107,13 +143,19 @@ function OutlineComponent({ outline, addSibling }: OutlineProps) {
           {outline &&
             outline.subs != undefined &&
             outline.subs.length != 0 &&
-            outline.subs.map((sub) => (
-              <OutlineComponent
-                key={sub.id}
-                outline={sub}
-                addSibling={onAddClicked(outline.id)}
-              />
-            ))}
+            outline.subs
+              .sort(
+                (o1, o2) =>
+                  outline.items.indexOf(Number(o2.id)) -
+                  outline.items.indexOf(Number(o1.id))
+              )
+              .map((sub) => (
+                <OutlineComponent
+                  key={sub.id}
+                  outline={sub}
+                  parentOutlineId={outline.id}
+                />
+              ))}
         </div>
       </div>
     </>

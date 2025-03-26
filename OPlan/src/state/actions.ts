@@ -2,10 +2,13 @@
 export enum ActionTypes {
   TITLE_CHANGED = "TITLE_CHANGED",
   INPUT_UPDATED = "INPUT_UPDATED",
-  ADD_CLICKED = "ADD_CLICKED",
+  NOTE_UPDATED = "NOTE_UPDATED",
+  ADD_SIBLING_CLICKED = "ADD_SIBLING_CLICKED",
+  ADD_CHILD_CLICKED = "ADD_CHILD_CLICKED",
   REMOVE_CLICKED = "REMOVE_CLICKED",
   PREVIEW_XML_CLICKED = "PREVIEW_XML_CLICKED",
-  SET_XML = "SET_XML",
+  IMPORT_XML_ADDED = "IMPORT_XML_ADDED",
+  IMPORT_OPML_CLICKED = "IMPORT_OPML_CLICKED",
 }
 
 type InputUpdate = {
@@ -23,8 +26,18 @@ export type InputUpdatedAction = {
   payload: InputUpdate;
 };
 
-export type AddClickedAction = {
-  type: ActionTypes.ADD_CLICKED;
+export type NoteUpdatedAction = {
+  type: ActionTypes.NOTE_UPDATED;
+  payload: InputUpdate;
+};
+
+export type AddSiblingClickedAction = {
+  type: ActionTypes.ADD_SIBLING_CLICKED;
+  payload: { outlineId: string; parentOutlineId: string | null };
+};
+
+export type AddChildClickedAction = {
+  type: ActionTypes.ADD_CHILD_CLICKED;
   payload: string;
 };
 
@@ -37,16 +50,23 @@ export type PreviewXmlCLickedAction = {
   type: ActionTypes.PREVIEW_XML_CLICKED;
 };
 
-export type SetXmlAction = {
-  type: ActionTypes.SET_XML;
+export type ImportXmlAddedAction = {
+  type: ActionTypes.IMPORT_XML_ADDED;
   payload: string;
+};
+
+export type ImportOpmlClickedAction = {
+  type: ActionTypes.IMPORT_OPML_CLICKED;
 };
 
 // Define a union type Actions to represent all possible action types
 export type Actions =
   | TitleChangedAction
   | InputUpdatedAction
-  | AddClickedAction
+  | NoteUpdatedAction
+  | AddSiblingClickedAction
+  | AddChildClickedAction
   | RemoveClickedAction
   | PreviewXmlCLickedAction
-  | SetXmlAction;
+  | ImportXmlAddedAction
+  | ImportOpmlClickedAction;

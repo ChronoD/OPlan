@@ -5,37 +5,39 @@ export function denormalize(norm: OutlineMap): Outline[] {
   const treeHash: Record<string, Outline> = Object.fromEntries(
     Object.entries(norm).map(([k, v]) => [k, { ...v, subs: [] }])
   );
-
   // keep track of trees with no parents
   const parentlessTrees = Object.fromEntries(
     Object.entries(norm).map(([k, v]) => [k, true])
   );
-
   Object.values(norm).forEach((v) => {
     // hook up children
-    treeHash[v.id].subs = v.items.map((k) => treeHash[k]);
+    treeHash[v.id].subs = v.items ? v.items.map((k) => treeHash[k]) : [];
     // trees that are children do have parents, remove from parentlessTrees
     v.items.forEach((k) => delete parentlessTrees[k]);
   });
-
   const parentlessTreeIds = Object.keys(parentlessTrees);
-  if (parentlessTreeIds.length !== 1)
-    throw new Error(
-      "uh oh, there are " +
-        parentlessTreeIds.length +
-        " parentless trees, but there should be exactly 1"
-    );
-  return [treeHash[parentlessTreeIds[0]]];
+  const parentlessOutlines = parentlessTreeIds.map((id) => treeHash[id]);
+  return parentlessOutlines;
 }
 
-export function normalize(tree: Outline): OutlineMap {
-  return Object.assign(
+export function normalize(outline: Outline): OutlineMap {
+  const isSubsDefined = outline.subs !== undefined;
+  const outlinesRecursive = isSubsDefined ? outline.subs.map(normalize) : [];
+  const resp = Object.assign(
     {
-      [tree.id]: {
-        ...tree,
-        items: tree.subs.map((v) => v.id),
+      [outline.id]: {
+        ...outline,
+        items: isSubsDefined ? outline.subs.map((v) => v.id) : [],
+        subs: isSubsDefined ? outline.subs : [],
       },
     },
-    ...tree.subs.map(normalize)
+    ...outlinesRecursive
   );
+  return resp;
+}
+
+export function unbeautifyXml(xml: string) {
+  xml = xml.replace(/>\s*/g, ">"); // Replace "> " with ">"
+  xml = xml.replace(/\s*</g, "<"); // Replace "< " with "<"
+  return xml;
 }
