@@ -25,6 +25,7 @@ function buildNewOutlineWithChild(
 }
 
 export const initialState: OPlanState = {
+  defaultSaveName: new Date().toISOString().slice(0, -5),
   outlines: {
     ["1"]: buildNewOutline("1"),
     // ["3"]: buildNewOutlineWithChild("3", "31"),

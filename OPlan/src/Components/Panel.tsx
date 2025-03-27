@@ -14,9 +14,11 @@ import {
   Button,
   Box,
   IconButton,
+  Typography,
 } from "@mui/material";
 import { denormalize } from "../state/functions";
 import { JsonForXml } from "../state/types";
+import SaveIcon from "@mui/icons-material/Save";
 import UploadIcon from "@mui/icons-material/Upload";
 
 function Panel() {
@@ -34,6 +36,8 @@ function Panel() {
       type: ActionTypes.PREVIEW_XML_CLICKED,
     });
   }
+
+  function saveToDefault(): void {}
 
   function onImportXmlFileAdded(e: ChangeEventHandler<HTMLInputElement>) {
     const file = e.target.files[0];
@@ -135,6 +139,18 @@ function Panel() {
         >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <Typography variant="subtitle1" component="p">
+                  Last saved at: {state.defaultSaveName}
+                </Typography>
+                <IconButton
+                  style={{ padding: 0 }}
+                  color="secondary"
+                  onClick={saveToDefault()}
+                >
+                  <SaveIcon />
+                </IconButton>
+              </Box>
               <input
                 type="file"
                 id="file"
