@@ -1,4 +1,4 @@
-import { normalize, unbeautifyXml } from "./functions";
+import { asOpmlJson, denormalize, normalize, unbeautifyXml } from "./functions";
 import { ActionTypes, Actions } from "./actions";
 import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
 import opml from "opml";
@@ -205,6 +205,62 @@ export function reducer(state: OPlanState, action: Actions) {
     }
     case ActionTypes.PREVIEW_XML_CLICKED: {
       return { ...state, showXml: !state.showXml };
+    }
+    case ActionTypes.SAVE_CLICKED: {
+      const saveName = "Save_" + action.payload;
+      try {
+        const outlines = denormalize(state.outlines);
+        const json = asOpmlJson(state.title, outlines);
+        const xml = json ? opml.stringify(json) : null;
+        const encodedXml = btoa(xml);
+        localStorage.setItem(saveName, encodedXml);
+      } catch (e) {
+        console.log("Unable to save: ", e);
+      }
+
+      return { ...state };
+    }
+    case ActionTypes.LOAD_SAVE_CLICKED: {
+      const saveContents = localStorage.getItem(action.payload);
+      if (saveContents) {
+        const xml = atob(saveContents);
+        let stateAfter = state;
+        opml.parse(xml, (error, parseResult) => {
+          if (error !== undefined) {
+            console.log("Error opening save: ", error);
+            stateAfter = { ...state };
+          } else {
+            const outlinesTreeWithIds = addIdsMultiple(
+              parseResult.opml.body.subs
+            );
+            const normalizedMultiples = outlinesTreeWithIds.map(normalize);
+            const outlinesMap = new Object();
+            normalizedMultiples.map((outlineKeyValue) =>
+              Object.entries(outlineKeyValue).map((outMap) => {
+                return Object.assign(outlinesMap, {
+                  [outMap[0].toString()]: outMap[1],
+                });
+              })
+            );
+            let enrichedOutline = parseResult.opml.body.subs[0];
+            enrichedOutline = addIds(enrichedOutline, "0");
+            stateAfter = {
+              ...state,
+              outlines: outlinesMap as any as OutlineMap,
+              title: parseResult.opml.head.title,
+            };
+          }
+        });
+
+        return {
+          ...stateAfter,
+        };
+      }
+      return { ...state };
+    }
+    case ActionTypes.REMOVE_SAVE_CLICKED: {
+      localStorage.removeItem(action.payload);
+      return { ...state };
     }
     default:
       return state;

@@ -9,6 +9,9 @@ export enum ActionTypes {
   PREVIEW_XML_CLICKED = "PREVIEW_XML_CLICKED",
   IMPORT_XML_ADDED = "IMPORT_XML_ADDED",
   IMPORT_OPML_CLICKED = "IMPORT_OPML_CLICKED",
+  SAVE_CLICKED = "SAVE_CLICKED",
+  LOAD_SAVE_CLICKED = "LOAD_SAVE_CLICKED",
+  REMOVE_SAVE_CLICKED = "REMOVE_SAVE_CLICKED",
 }
 
 type InputUpdate = {
@@ -59,6 +62,21 @@ export type ImportOpmlClickedAction = {
   type: ActionTypes.IMPORT_OPML_CLICKED;
 };
 
+export type SaveClickedAction = {
+  type: ActionTypes.SAVE_CLICKED;
+  payload: string;
+};
+
+export type LoadSavedClickedAction = {
+  type: ActionTypes.LOAD_SAVE_CLICKED;
+  payload: string;
+};
+
+export type RemoveSaveClickedAction = {
+  type: ActionTypes.REMOVE_SAVE_CLICKED;
+  payload: string;
+};
+
 // Define a union type Actions to represent all possible action types
 export type Actions =
   | TitleChangedAction
@@ -69,4 +87,7 @@ export type Actions =
   | RemoveClickedAction
   | PreviewXmlCLickedAction
   | ImportXmlAddedAction
-  | ImportOpmlClickedAction;
+  | ImportOpmlClickedAction
+  | SaveClickedAction
+  | LoadSavedClickedAction
+  | RemoveSaveClickedAction;

@@ -1,4 +1,4 @@
-import { OutlineMap, Outline } from "./types";
+import { OutlineMap, Outline, JsonForXml } from "./types";
 
 export function denormalize(norm: OutlineMap): Outline[] {
   // make Trees with no children
@@ -40,4 +40,13 @@ export function unbeautifyXml(xml: string) {
   xml = xml.replace(/>\s*/g, ">"); // Replace "> " with ">"
   xml = xml.replace(/\s*</g, "<"); // Replace "< " with "<"
   return xml;
+}
+
+export function asOpmlJson(title: string, outlines: Outline[]): JsonForXml {
+  return {
+    opml: {
+      head: { title: title },
+      body: { subs: outlines },
+    },
+  };
 }
