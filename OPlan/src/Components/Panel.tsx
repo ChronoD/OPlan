@@ -15,9 +15,10 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-import { denormalize } from "../state/functions";
-import { JsonForXml } from "../state/types";
+import { asOpmlJson, denormalize } from "../state/functions";
+import { JsonForXml, Outline } from "../state/types";
 import UploadIcon from "@mui/icons-material/Upload";
+import SaveTool from "./SaveTool";
 
 function Panel() {
   const { state, dispatch } = useAppContext();
@@ -66,14 +67,30 @@ function Panel() {
     });
   }
 
-  const outlines = denormalize(state.outlines);
+  function save(): void {
+    const saveName = state.title + "_" + new Date().toISOString().slice(0, -5);
 
-  function stateToXmlJson(): JsonForXml {
-    return {
-      opml: {
-        head: { title: state.title },
-        body: { subs: outlines },
-      },
+    dispatch({
+      type: ActionTypes.SAVE_CLICKED,
+      payload: saveName,
+    });
+  }
+
+  function load(saveName: string): () => void {
+    return () => {
+      dispatch({
+        type: ActionTypes.LOAD_SAVE_CLICKED,
+        payload: saveName,
+      });
+    };
+  }
+
+  function removeSave(saveName: string): () => void {
+    return () => {
+      dispatch({
+        type: ActionTypes.REMOVE_SAVE_CLICKED,
+        payload: saveName,
+      });
     };
   }
 
@@ -81,9 +98,21 @@ function Panel() {
     navigator.clipboard.writeText(xml);
   }
 
-  const json = stateToXmlJson();
+  const outlines = denormalize(state.outlines);
+  const json = asOpmlJson(state.title, outlines);
   const xml = json ? opml.stringify(json) : null;
   const file = new Blob([xml], { type: "text/plain" });
+
+  const allSaves = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    if (localStorage) {
+      const keyName = localStorage.key(i);
+      if (keyName?.startsWith("Save_")) {
+        allSaves.push(keyName);
+      }
+    }
+  }
+
   return (
     <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
       <Grid2
@@ -135,6 +164,12 @@ function Panel() {
         >
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <SaveTool
+                save={save}
+                load={load}
+                saves={allSaves}
+                removeSave={removeSave}
+              />
               <input
                 type="file"
                 id="file"
