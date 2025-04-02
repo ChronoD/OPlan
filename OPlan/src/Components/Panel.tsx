@@ -67,8 +67,9 @@ function Panel() {
     });
   }
 
+  const saveName = state.title + "_" + new Date().toISOString().slice(0, -5);
+
   function save(): void {
-    const saveName = state.title + "_" + new Date().toISOString().slice(0, -5);
 
     dispatch({
       type: ActionTypes.SAVE_CLICKED,
@@ -221,7 +222,7 @@ function Panel() {
                 variant="contained"
               >
                 <a
-                  download="outlines.opml"
+                  download={saveName + ".opml"}
                   target="_blank"
                   rel="noreferrer"
                   href={URL.createObjectURL(file)}
