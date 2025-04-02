@@ -66,7 +66,9 @@ function Panel() {
     });
   }
 
-  const outlines = denormalize(state.outlines);
+const saveName = state.title + "_" + new Date().toISOString().slice(0, -5);
+
+  function save(): void {
 
   function stateToXmlJson(): JsonForXml {
     return {
@@ -186,7 +188,7 @@ function Panel() {
                 variant="contained"
               >
                 <a
-                  download="outlines.opml"
+                  download={saveName + ".opml"}
                   target="_blank"
                   rel="noreferrer"
                   href={URL.createObjectURL(file)}
