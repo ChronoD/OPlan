@@ -50,3 +50,8 @@ export function asOpmlJson(title: string, outlines: Outline[]): JsonForXml {
     },
   };
 }
+
+export function updatePosition(array: any[], fromIndex: any, element: any) {
+  array.splice(fromIndex, 0, Number(element));
+  return array;
+}

@@ -1,4 +1,10 @@
-import { asOpmlJson, denormalize, normalize, unbeautifyXml } from "./functions";
+import {
+  asOpmlJson,
+  denormalize,
+  normalize,
+  unbeautifyXml,
+  updatePosition,
+} from "./functions";
 import { ActionTypes, Actions } from "./actions";
 import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
 import opml from "opml";
@@ -261,6 +267,168 @@ export function reducer(state: OPlanState, action: Actions) {
     case ActionTypes.REMOVE_SAVE_CLICKED: {
       localStorage.removeItem(action.payload);
       return { ...state };
+    }
+    case ActionTypes.MOVE_UP_CLICKED: {
+      if (action.payload.parentOutlineId === null) {
+        const currentIndex = state.topOutlineOrder.indexOf(
+          Number(action.payload.outlineId)
+        );
+        const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+        const newTopOutlineOrder = updatePosition(
+          state.topOutlineOrder,
+          currentIndex,
+          targetIndex
+        );
+        return { ...state, topOutlineOrder: newTopOutlineOrder };
+      } else {
+        const parentOutline = state.outlines[action.payload.parentOutlineId];
+        const currentIndex = parentOutline.items.indexOf(
+          action.payload.outlineId
+        );
+        const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+        const newItemsOrder = updatePosition(
+          parentOutline.items,
+          currentIndex,
+          targetIndex
+        );
+        state.outlines[action.payload.parentOutlineId] = {
+          ...parentOutline,
+          items: [...newItemsOrder],
+        };
+        return { ...state };
+      }
+    }
+    case ActionTypes.MOVE_DOWN_CLICKED: {
+      console.log(action.payload);
+      if (action.payload.parentOutlineId === null) {
+        const currentIndex = state.topOutlineOrder.indexOf(
+          Number(action.payload.outlineId)
+        );
+        const targetIndex =
+          currentIndex < state.topOutlineOrder.length
+            ? currentIndex + 1
+            : state.topOutlineOrder.length;
+        const newTopOutlineOrder = updatePosition(
+          state.topOutlineOrder,
+          currentIndex,
+          targetIndex
+        );
+        return { ...state, topOutlineOrder: newTopOutlineOrder };
+      } else {
+        const parentOutline = state.outlines[action.payload.parentOutlineId];
+        const currentIndex = parentOutline.items.indexOf(
+          action.payload.outlineId
+        );
+        const targetIndex =
+          currentIndex < state.topOutlineOrder.length
+            ? currentIndex + 1
+            : state.topOutlineOrder.length;
+        const newItemsOrder = updatePosition(
+          parentOutline.items,
+          currentIndex,
+          targetIndex
+        );
+        state.outlines[action.payload.parentOutlineId] = {
+          ...parentOutline,
+          items: [...newItemsOrder],
+        };
+        return { ...state };
+      }
+    }
+    case ActionTypes.MOVE_OUT_CLICKED: {
+      if (action.payload.parentOutlineId !== null) {
+        const parentOutline = state.outlines[action.payload.parentOutlineId];
+        const topParentIndex = state.topOutlineOrder.indexOf(
+          Number(parentOutline.id)
+        );
+        if (topParentIndex === -1) {
+          const updatedParentItems = parentOutline.items.filter(
+            (item) => item !== action.payload.outlineId
+          );
+          state.outlines[action.payload.parentOutlineId] = {
+            ...parentOutline,
+            items: updatedParentItems,
+          };
+          const outlines = Object.keys(state.outlines).map(function (key) {
+            return state.outlines[key];
+          });
+          const parentsParentId = outlines.filter(
+            (outline) => outline.items.indexOf(parentOutline.id) !== -1
+          )[0].id;
+          const parentsParent = state.outlines[parentsParentId];
+          const currentParentIndexInParentsParent = parentsParent.items.indexOf(
+            parentOutline.id
+          );
+          const indexToPutOutlineOnParentsParentItems =
+            currentParentIndexInParentsParent > 0
+              ? currentParentIndexInParentsParent - 1
+              : 0;
+          const newparentsParentItemsOrder = updatePosition(
+            parentsParent.items,
+            indexToPutOutlineOnParentsParentItems,
+            action.payload.outlineId
+          );
+          state.outlines[parentsParent.id] = {
+            ...parentsParent,
+            items: newparentsParentItemsOrder,
+          };
+          return { ...state };
+        } else {
+          const targetIndex = topParentIndex > 0 ? topParentIndex : 1;
+          const newTopOutlineOrder = updatePosition(
+            state.topOutlineOrder,
+            targetIndex,
+            action.payload.outlineId
+          );
+          const updatedParentItems = parentOutline.items.filter(
+            (item) => item !== action.payload.outlineId
+          );
+          state.outlines[action.payload.parentOutlineId] = {
+            ...parentOutline,
+            items: updatedParentItems,
+          };
+          console.log(newTopOutlineOrder);
+          return { ...state, topOutlineOrder: newTopOutlineOrder };
+        }
+      }
+      return { ...state };
+    }
+    case ActionTypes.MOVE_IN_CLICKED: {
+      console.log(action.payload);
+      if (action.payload.parentOutlineId === null) {
+        const currentIndex = state.topOutlineOrder.indexOf(
+          Number(action.payload.outlineId)
+        );
+        const targetIndex =
+          currentIndex < state.topOutlineOrder.length
+            ? currentIndex + 1
+            : state.topOutlineOrder.length;
+        const newTopOutlineOrder = updatePosition(
+          state.topOutlineOrder,
+          currentIndex,
+          targetIndex
+        );
+        return { ...state, topOutlineOrder: newTopOutlineOrder };
+      } else {
+        const parentOutline = state.outlines[action.payload.parentOutlineId];
+        const currentIndex = parentOutline.items.indexOf(
+          action.payload.outlineId
+        );
+        const targetIndex =
+          currentIndex < state.topOutlineOrder.length
+            ? currentIndex + 1
+            : state.topOutlineOrder.length;
+        const newItemsOrder = updatePosition(
+          parentOutline.items,
+          currentIndex,
+          targetIndex
+        );
+        state.outlines[action.payload.parentOutlineId] = {
+          ...parentOutline,
+          items: [...newItemsOrder],
+        };
+        return { ...state };
+      }
     }
     default:
       return state;

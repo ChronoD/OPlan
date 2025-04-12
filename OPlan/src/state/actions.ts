@@ -12,6 +12,10 @@ export enum ActionTypes {
   SAVE_CLICKED = "SAVE_CLICKED",
   LOAD_SAVE_CLICKED = "LOAD_SAVE_CLICKED",
   REMOVE_SAVE_CLICKED = "REMOVE_SAVE_CLICKED",
+  MOVE_UP_CLICKED = "MOVE_UP_CLICKED",
+  MOVE_DOWN_CLICKED = "MOVE_DOWN_CLICKED",
+  MOVE_OUT_CLICKED = "MOVE_OUT_CLICKED",
+  MOVE_IN_CLICKED = "MOVE_IN_CLICKED",
 }
 
 type InputUpdate = {
@@ -77,6 +81,26 @@ export type RemoveSaveClickedAction = {
   payload: string;
 };
 
+export type MoveUpClickedAction = {
+  type: ActionTypes.MOVE_UP_CLICKED;
+  payload: { outlineId: string; parentOutlineId: string | null };
+};
+
+export type MoveDownClickedAction = {
+  type: ActionTypes.MOVE_DOWN_CLICKED;
+  payload: { outlineId: string; parentOutlineId: string | null };
+};
+
+export type MoveOutClickedAction = {
+  type: ActionTypes.MOVE_OUT_CLICKED;
+  payload: { outlineId: string; parentOutlineId: string | null };
+};
+
+export type MoveInClickedAction = {
+  type: ActionTypes.MOVE_IN_CLICKED;
+  payload: { outlineId: string; parentOutlineId: string | null };
+};
+
 // Define a union type Actions to represent all possible action types
 export type Actions =
   | TitleChangedAction
@@ -90,4 +114,8 @@ export type Actions =
   | ImportOpmlClickedAction
   | SaveClickedAction
   | LoadSavedClickedAction
-  | RemoveSaveClickedAction;
+  | RemoveSaveClickedAction
+  | MoveUpClickedAction
+  | MoveDownClickedAction
+  | MoveOutClickedAction
+  | MoveInClickedAction;

@@ -7,6 +7,10 @@ import { ChangeEvent } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 interface OutlineProps {
   outline: Outline;
@@ -67,6 +71,34 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
     }
   }
 
+  function onUpClicked() {
+    dispatch({
+      type: ActionTypes.MOVE_UP_CLICKED,
+      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
+    });
+  }
+
+  function onDownClicked() {
+    dispatch({
+      type: ActionTypes.MOVE_DOWN_CLICKED,
+      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
+    });
+  }
+
+  function onOutClicked() {
+    dispatch({
+      type: ActionTypes.MOVE_OUT_CLICKED,
+      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
+    });
+  }
+
+  function onInClicked() {
+    dispatch({
+      type: ActionTypes.MOVE_OUT_CLICKED,
+      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
+    });
+  }
+
   return (
     <>
       <div
@@ -94,6 +126,22 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
             >
               <RemoveIcon />
             </IconButton>
+            <Box>
+              <IconButton style={{ padding: 0 }} onClick={onOutClicked}>
+                <ArrowBackIcon />
+              </IconButton>
+              <IconButton onClick={onInClicked}>
+                <ArrowForwardIcon />
+              </IconButton>
+            </Box>
+            <Box>
+              <IconButton style={{ padding: 0 }} onClick={onUpClicked}>
+                <ArrowUpwardIcon />
+              </IconButton>
+              <IconButton onClick={onDownClicked}>
+                <ArrowDownwardIcon />
+              </IconButton>
+            </Box>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <TextareaAutosize
                 style={{
