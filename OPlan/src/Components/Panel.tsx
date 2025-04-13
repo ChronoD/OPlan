@@ -221,7 +221,7 @@ function Panel() {
                 variant="contained"
               >
                 <a
-                  download="outlines.opml"
+                  download={state.title + ".opml"}
                   target="_blank"
                   rel="noreferrer"
                   href={URL.createObjectURL(file)}
