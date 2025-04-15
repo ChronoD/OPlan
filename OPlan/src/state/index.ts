@@ -1,4 +1,10 @@
-import { asOpmlJson, denormalize, normalize, unbeautifyXml } from "./functions";
+import {
+  asOpmlJson,
+  denormalize,
+  normalize,
+  toXml,
+  unbeautifyXml,
+} from "./functions";
 import { ActionTypes, Actions } from "./actions";
 import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
 import opml from "opml";
@@ -211,7 +217,7 @@ export function reducer(state: OPlanState, action: Actions) {
       try {
         const outlines = denormalize(state.outlines);
         const json = asOpmlJson(state.title, outlines);
-        const xml = json ? opml.stringify(json) : null;
+        const xml = toXml(json);
         const encodedXml = btoa(xml);
         localStorage.setItem(saveName, encodedXml);
       } catch (e) {
