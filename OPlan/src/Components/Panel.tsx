@@ -1,6 +1,5 @@
 import { ChangeEvent, ChangeEventHandler } from "react";
 import "../App.css";
-import opml from "opml";
 import { useAppContext } from "../state/useAppContext";
 import OutlineComponent from "./Outline";
 import { ActionTypes } from "../state/actions";
@@ -15,8 +14,7 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-import { asOpmlJson, denormalize } from "../state/functions";
-import { JsonForXml, Outline } from "../state/types";
+import { asOpmlJson, denormalize, toXml } from "../state/functions";
 import UploadIcon from "@mui/icons-material/Upload";
 import SaveTool from "./SaveTool";
 
@@ -100,7 +98,7 @@ function Panel() {
 
   const outlines = denormalize(state.outlines);
   const json = asOpmlJson(state.title, outlines);
-  const xml = json ? opml.stringify(json) : null;
+  const xml = toXml(json);
   const file = new Blob([xml], { type: "text/plain" });
 
   const allSaves = [];
