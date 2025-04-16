@@ -1,3 +1,4 @@
+import opml from "opml";
 import { OutlineMap, Outline, JsonForXml } from "./types";
 
 export function denormalize(norm: OutlineMap): Outline[] {
@@ -49,6 +50,18 @@ export function asOpmlJson(title: string, outlines: Outline[]): JsonForXml {
       body: { subs: outlines },
     },
   };
+}
+
+export function toXml(json: {}): string {
+  if (!json) {
+    return "";
+  }
+  const xmlRaw = opml.stringify(json);
+  const xml = xmlRaw.replace(
+    new RegExp('encoding="ISO-8859-1"'),
+    'encoding="UTF-8"'
+  );
+  return xml;
 }
 
 export function updatePosition(array: any[], fromIndex: any, element: any) {
