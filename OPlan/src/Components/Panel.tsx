@@ -144,8 +144,8 @@ function Panel() {
               outlines
                 .sort(
                   (o1, o2) =>
-                    state.topOutlineOrder.indexOf(Number(o1.id)) -
-                    state.topOutlineOrder.indexOf(Number(o2.id))
+                    state.topOutlineOrder.indexOf(o1.id) -
+                    state.topOutlineOrder.indexOf(o2.id)
                 )
                 .map((out) => (
                   <OutlineComponent

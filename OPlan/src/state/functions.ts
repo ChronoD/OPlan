@@ -64,7 +64,16 @@ export function toXml(json: {}): string {
   return xml;
 }
 
-export function updatePosition(array: any[], fromIndex: any, element: any) {
-  array.splice(fromIndex, 0, Number(element));
-  return array;
+export function updatePosition(
+  array: string[],
+  fromIndex: number,
+  element: string
+) {
+  console.log(array, "fromIndex: ", fromIndex, "element:", element);
+
+  const filtered = array.filter((ind) => {
+    return ind !== element;
+  });
+
+  return filtered;
 }

@@ -32,14 +32,13 @@ function buildNewOutlineWithChild(
 }
 
 export const initialState: OPlanState = {
-  defaultSaveName: new Date().toISOString().slice(0, -5),
   outlines: {
     ["1"]: buildNewOutline("1"),
     // ["3"]: buildNewOutlineWithChild("3", "31"),
     // ["31"]: buildNewOutline("31"),
   },
   showXml: true,
-  topOutlineOrder: [1],
+  topOutlineOrder: ["1"],
   title: "",
   importXml: null,
   importEnabled: true,
@@ -105,8 +104,8 @@ export function reducer(state: OPlanState, action: Actions) {
       const outId = action.payload.outlineId;
       let topOrder = state.topOutlineOrder;
       if (action.payload.parentOutlineId === null) {
-        const outlineIndex = topOrder.indexOf(Number(outId));
-        topOrder.splice(outlineIndex + 1, 0, Number(newOutlineId));
+        const outlineIndex = topOrder.indexOf(outId);
+        topOrder.splice(outlineIndex + 1, 0, newOutlineId);
       } else {
         const parentOutline = state.outlines[action.payload.parentOutlineId];
         const outlineIndex = parentOutline.items.indexOf(outId);
@@ -272,14 +271,16 @@ export function reducer(state: OPlanState, action: Actions) {
     case ActionTypes.MOVE_UP_CLICKED: {
       if (action.payload.parentOutlineId === null) {
         const currentIndex = state.topOutlineOrder.indexOf(
-          Number(action.payload.outlineId)
+          action.payload.outlineId
         );
+        console.log(currentIndex);
         const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
         const newTopOutlineOrder = updatePosition(
           state.topOutlineOrder,
-          currentIndex,
-          targetIndex
+          targetIndex,
+          action.payload.outlineId
         );
+        console.log(newTopOutlineOrder);
         return { ...state, topOutlineOrder: newTopOutlineOrder };
       } else {
         const parentOutline = state.outlines[action.payload.parentOutlineId];
@@ -290,12 +291,14 @@ export function reducer(state: OPlanState, action: Actions) {
         const newItemsOrder = updatePosition(
           parentOutline.items,
           currentIndex,
-          targetIndex
+          targetIndex.toString()
         );
         state.outlines[action.payload.parentOutlineId] = {
           ...parentOutline,
           items: [...newItemsOrder],
         };
+        console.log(newItemsOrder);
+
         return { ...state };
       }
     }
@@ -303,7 +306,7 @@ export function reducer(state: OPlanState, action: Actions) {
       console.log(action.payload);
       if (action.payload.parentOutlineId === null) {
         const currentIndex = state.topOutlineOrder.indexOf(
-          Number(action.payload.outlineId)
+          action.payload.outlineId
         );
         const targetIndex =
           currentIndex < state.topOutlineOrder.length
@@ -312,7 +315,7 @@ export function reducer(state: OPlanState, action: Actions) {
         const newTopOutlineOrder = updatePosition(
           state.topOutlineOrder,
           currentIndex,
-          targetIndex
+          targetIndex.toString()
         );
         return { ...state, topOutlineOrder: newTopOutlineOrder };
       } else {
@@ -327,7 +330,7 @@ export function reducer(state: OPlanState, action: Actions) {
         const newItemsOrder = updatePosition(
           parentOutline.items,
           currentIndex,
-          targetIndex
+          targetIndex.toString()
         );
         state.outlines[action.payload.parentOutlineId] = {
           ...parentOutline,
@@ -339,9 +342,7 @@ export function reducer(state: OPlanState, action: Actions) {
     case ActionTypes.MOVE_OUT_CLICKED: {
       if (action.payload.parentOutlineId !== null) {
         const parentOutline = state.outlines[action.payload.parentOutlineId];
-        const topParentIndex = state.topOutlineOrder.indexOf(
-          Number(parentOutline.id)
-        );
+        const topParentIndex = state.topOutlineOrder.indexOf(parentOutline.id);
         if (topParentIndex === -1) {
           const updatedParentItems = parentOutline.items.filter(
             (item) => item !== action.payload.outlineId
@@ -375,9 +376,9 @@ export function reducer(state: OPlanState, action: Actions) {
           };
           return { ...state };
         } else {
-          const targetIndex = topParentIndex > 0 ? topParentIndex : 1;
-          const newTopOutlineOrder = updatePosition(
-            state.topOutlineOrder,
+          const targetIndex = topParentIndex > 0 ? topParentIndex - 1 : 0;
+          const newTopOutlineOrder: string[] = updatePosition(
+            state.topOutlineOrder.map(String),
             targetIndex,
             action.payload.outlineId
           );
@@ -388,7 +389,6 @@ export function reducer(state: OPlanState, action: Actions) {
             ...parentOutline,
             items: updatedParentItems,
           };
-          console.log(newTopOutlineOrder);
           return { ...state, topOutlineOrder: newTopOutlineOrder };
         }
       }
@@ -398,7 +398,7 @@ export function reducer(state: OPlanState, action: Actions) {
       console.log(action.payload);
       if (action.payload.parentOutlineId === null) {
         const currentIndex = state.topOutlineOrder.indexOf(
-          Number(action.payload.outlineId)
+          action.payload.outlineId
         );
         const targetIndex =
           currentIndex < state.topOutlineOrder.length
@@ -407,7 +407,7 @@ export function reducer(state: OPlanState, action: Actions) {
         const newTopOutlineOrder = updatePosition(
           state.topOutlineOrder,
           currentIndex,
-          targetIndex
+          targetIndex.toString()
         );
         return { ...state, topOutlineOrder: newTopOutlineOrder };
       } else {
@@ -422,7 +422,7 @@ export function reducer(state: OPlanState, action: Actions) {
         const newItemsOrder = updatePosition(
           parentOutline.items,
           currentIndex,
-          targetIndex
+          targetIndex.toString()
         );
         state.outlines[action.payload.parentOutlineId] = {
           ...parentOutline,
