@@ -1,16 +1,10 @@
 import "../App.css";
-import { Box, IconButton, TextareaAutosize } from "@mui/material";
+import { Box, TextareaAutosize } from "@mui/material";
 import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
 import { ActionTypes } from "../state/actions";
 import { ChangeEvent } from "react";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import OutlineLeftButtons from "./OutlineLeftButtons";
 
 interface OutlineProps {
   outline: Outline;
@@ -33,16 +27,6 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
         type: ActionTypes.ADD_CHILD_CLICKED,
         payload: id,
       });
-    };
-  }
-
-  function onRemoveClicked(id: string) {
-    return () => {
-      if (outline.subs.length === 0)
-        dispatch({
-          type: ActionTypes.REMOVE_CLICKED,
-          payload: id,
-        });
     };
   }
 
@@ -71,142 +55,84 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
     }
   }
 
-  function onUpClicked() {
-    dispatch({
-      type: ActionTypes.MOVE_UP_CLICKED,
-      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
-    });
-  }
-
-  function onDownClicked() {
-    dispatch({
-      type: ActionTypes.MOVE_DOWN_CLICKED,
-      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
-    });
-  }
-
-  function onOutClicked() {
-    dispatch({
-      type: ActionTypes.MOVE_OUT_CLICKED,
-      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
-    });
-  }
-
-  function onInClicked() {
-    dispatch({
-      type: ActionTypes.MOVE_IN_CLICKED,
-      payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
-    });
-  }
-
   return (
-    <>
-      <div
-        style={{
-          padding: "6px 0px 6px 6px",
-          display: "flex",
-          justifyContent: "start",
-          flexDirection: "column",
-        }}
-      >
-        {outline && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "start",
-              flexDirection: "row",
-              paddingLeft: "12px",
-            }}
-          >
-            <IconButton
-              style={{ padding: 0 }}
-              color="secondary"
-              disabled={outline.subs.length !== 0}
-              onClick={onRemoveClicked(outline.id)}
-            >
-              <RemoveIcon />
-            </IconButton>
-            <Box>
-              <IconButton style={{ padding: 0 }} onClick={onOutClicked}>
-                <ArrowBackIcon />
-              </IconButton>
-              <IconButton onClick={onInClicked}>
-                <ArrowForwardIcon />
-              </IconButton>
-            </Box>
-            <Box>
-              <IconButton style={{ padding: 0 }} onClick={onUpClicked}>
-                <ArrowUpwardIcon />
-              </IconButton>
-              <IconButton onClick={onDownClicked}>
-                <ArrowDownwardIcon />
-              </IconButton>
-            </Box>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <TextareaAutosize
-                style={{
-                  minHeight: "20px",
-                  minWidth: "600px",
-                  fontSize: "20px",
-                }}
-                aria-label="empty textarea"
-                placeholder=">"
-                value={outline.text}
-                id={outline.id}
-                onChange={onInputUpdate}
-                onKeyDown={onKeyDown}
-              />
-              <TextareaAutosize
-                style={{
-                  width: "600px",
-                  background: "#6d7271",
-                  fontSize: "16px",
-                }}
-                aria-label="empty textarea"
-                placeholder=""
-                value={outline._note}
-                id={outline.id + "_note"}
-                onChange={onNoteUpdate}
-                onKeyDown={onKeyDown}
-              />
-            </Box>
-            <IconButton style={{ padding: 0 }} onClick={onAddSiblingClicked}>
-              <AddIcon />
-            </IconButton>
-            <IconButton
-              style={{ padding: 0 }}
-              onClick={onAddChildClicked(outline.id)}
-            >
-              <SubdirectoryArrowRightIcon />
-            </IconButton>
-          </div>
-        )}
+    <div
+      style={{
+        padding: "6px 0px 6px 6px",
+        display: "flex",
+        justifyContent: "start",
+        flexDirection: "column",
+        minHeight: "70px",
+      }}
+    >
+      {outline && (
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             justifyContent: "start",
+            flexDirection: "row",
+            paddingLeft: "12px",
           }}
         >
-          {outline &&
-            outline.subs != undefined &&
-            outline.subs.length != 0 &&
-            outline.subs
-              .sort(
-                (o1, o2) =>
-                  outline.items.indexOf(Number(o2.id)) -
-                  outline.items.indexOf(Number(o1.id))
-              )
-              .map((sub) => (
-                <OutlineComponent
-                  key={sub.id}
-                  outline={sub}
-                  parentOutlineId={outline.id}
-                />
-              ))}
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <TextareaAutosize
+              style={{
+                minHeight: "20px",
+                minWidth: "600px",
+                fontSize: "20px",
+              }}
+              aria-label="empty textarea"
+              placeholder=">"
+              value={outline.text}
+              id={outline.id}
+              onChange={onInputUpdate}
+              onKeyDown={onKeyDown}
+            />
+            <TextareaAutosize
+              style={{
+                width: "600px",
+                background: "#6d7271",
+                fontSize: "16px",
+              }}
+              aria-label="empty textarea"
+              placeholder=""
+              value={outline._note}
+              id={outline.id + "_note"}
+              onChange={onNoteUpdate}
+              onKeyDown={onKeyDown}
+            />
+          </Box>
+          <OutlineLeftButtons
+            outline={outline}
+            parentOutlineId={parentOutlineId}
+          />
         </div>
+      )}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "start",
+        }}
+      >
+        {outline &&
+          outline.subs != undefined &&
+          outline.subs.length != 0 &&
+          outline.subs
+            .sort(
+              (o1, o2) =>
+                outline.items.indexOf(Number(o2.id)) -
+                outline.items.indexOf(Number(o1.id))
+            )
+            .map((sub) => (
+              <OutlineComponent
+                key={sub.id}
+                outline={sub}
+                parentOutlineId={outline.id}
+              />
+            ))}
       </div>
-    </>
+    </div>
   );
 }
 

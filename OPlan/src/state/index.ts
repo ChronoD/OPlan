@@ -3,7 +3,6 @@ import {
   denormalize,
   normalize,
   unbeautifyXml,
-  updatePosition,
   toXml,
   moveElementBackwardsByOne,
   moveElementForwardsByOne,
@@ -315,9 +314,6 @@ export function reducer(state: OPlanState, action: Actions) {
       }
     }
     case ActionTypes.MOVE_OUT_CLICKED: {
-      console.log(state.outlines);
-      console.log("topOrder ", state.topOutlineOrder);
-
       if (action.payload.parentOutlineId !== null) {
         // find parent
         const parentOutline = state.outlines[action.payload.parentOutlineId];
@@ -326,7 +322,6 @@ export function reducer(state: OPlanState, action: Actions) {
           (item) => item !== action.payload.outlineId
         );
         state.outlines[action.payload.parentOutlineId] = parentOutline;
-
         // move after parent
         const parentsParent: undefined | NormalizedOutline = Object.values(
           state.outlines
@@ -339,7 +334,6 @@ export function reducer(state: OPlanState, action: Actions) {
         });
         if (parentsParent) {
           const indexOfParent = parentsParent.items.indexOf(parentOutline.id);
-
           parentsParent.items.splice(
             indexOfParent + 1,
             0,
@@ -348,7 +342,6 @@ export function reducer(state: OPlanState, action: Actions) {
           return { ...state };
         } else {
           const indexOfParent = state.topOutlineOrder.indexOf(parentOutline.id);
-
           state.topOutlineOrder.splice(
             indexOfParent + 1,
             0,
@@ -361,9 +354,6 @@ export function reducer(state: OPlanState, action: Actions) {
     }
     case ActionTypes.MOVE_IN_CLICKED: {
       let nextSibling = null;
-      console.log(state.outlines);
-      console.log("topOrder ", state.topOutlineOrder);
-
       if (action.payload.parentOutlineId === null) {
         const currentIndex = state.topOutlineOrder.indexOf(
           action.payload.outlineId

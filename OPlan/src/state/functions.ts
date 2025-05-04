@@ -78,34 +78,6 @@ export function updatePosition(
   return filtered;
 }
 
-export function insertElement1BeforeElement2(
-  element1: string,
-  element2: string,
-  array: string[]
-) {
-  const indexOf2: number = array.indexOf(element2);
-  if (indexOf2 === -1) {
-    array.splice(0, 0, element1);
-  } else {
-    array.splice(indexOf2, 0, element1);
-  }
-  return array;
-}
-
-export function insertElement1AfterElement2(
-  element1: string,
-  element2: string,
-  array: string[]
-) {
-  const indexOf2: number = array.indexOf(element2);
-  if (indexOf2 === -1) {
-    array.push(element1);
-  } else {
-    array.splice(indexOf2 + 1, 0, element1);
-  }
-  return array;
-}
-
 export function moveElementForwardsByOne(element1: string, array: string[]) {
   const index: number = array.indexOf(element1);
   if (index !== -1 && index - 1 > -1) {
