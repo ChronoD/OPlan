@@ -94,7 +94,7 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
 
   function onInClicked() {
     dispatch({
-      type: ActionTypes.MOVE_OUT_CLICKED,
+      type: ActionTypes.MOVE_IN_CLICKED,
       payload: { outlineId: outline.id, parentOutlineId: parentOutlineId },
     });
   }

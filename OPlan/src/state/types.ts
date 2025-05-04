@@ -16,6 +16,7 @@ export interface NormalizedOutline {
   text: string | undefined;
   _note: string | undefined;
   items: string[];
+  parent?: NormalizedOutline;
 }
 
 export interface OutlineRaw {

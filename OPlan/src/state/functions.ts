@@ -77,3 +77,57 @@ export function updatePosition(
 
   return filtered;
 }
+
+export function insertElement1BeforeElement2(
+  element1: string,
+  element2: string,
+  array: string[]
+) {
+  const indexOf2: number = array.indexOf(element2);
+  if (indexOf2 === -1) {
+    array.splice(0, 0, element1);
+  } else {
+    array.splice(indexOf2, 0, element1);
+  }
+  return array;
+}
+
+export function insertElement1AfterElement2(
+  element1: string,
+  element2: string,
+  array: string[]
+) {
+  const indexOf2: number = array.indexOf(element2);
+  if (indexOf2 === -1) {
+    array.push(element1);
+  } else {
+    array.splice(indexOf2 + 1, 0, element1);
+  }
+  return array;
+}
+
+export function moveElementForwardsByOne(element1: string, array: string[]) {
+  const index: number = array.indexOf(element1);
+  if (index !== -1 && index - 1 > -1) {
+    return moveElement(array, index, index - 1);
+  } else {
+    return array;
+  }
+}
+
+export function moveElementBackwardsByOne(element1: string, array: string[]) {
+  const index: number = array.indexOf(element1);
+  if (index !== -1 && index + 1 !== array.length) {
+    return moveElement(array, index, index + 1);
+  } else {
+    return array;
+  }
+}
+
+function moveElement(arr: string[], fromIndex: number, toIndex: number) {
+  return arr.map((item, index) => {
+    if (index === toIndex) return arr[fromIndex];
+    if (index === fromIndex) return arr[toIndex];
+    return item;
+  });
+}
