@@ -3,7 +3,7 @@ export type OPlanState = {
   showXml: boolean;
   importXml: string | null;
   importEnabled: boolean;
-  topOutlineOrder: Number[];
+  topOutlineOrder: string[];
   title: string;
 };
 

@@ -63,3 +63,43 @@ export function toXml(json: {}): string {
   );
   return xml;
 }
+
+export function updatePosition(
+  array: string[],
+  fromIndex: number,
+  element: string
+) {
+  console.log(array, "fromIndex: ", fromIndex, "element:", element);
+
+  const filtered = array.filter((ind) => {
+    return ind !== element;
+  });
+
+  return filtered;
+}
+
+export function moveElementForwardsByOne(element1: string, array: string[]) {
+  const index: number = array.indexOf(element1);
+  if (index !== -1 && index - 1 > -1) {
+    return moveElement(array, index, index - 1);
+  } else {
+    return array;
+  }
+}
+
+export function moveElementBackwardsByOne(element1: string, array: string[]) {
+  const index: number = array.indexOf(element1);
+  if (index !== -1 && index + 1 !== array.length) {
+    return moveElement(array, index, index + 1);
+  } else {
+    return array;
+  }
+}
+
+function moveElement(arr: string[], fromIndex: number, toIndex: number) {
+  return arr.map((item, index) => {
+    if (index === toIndex) return arr[fromIndex];
+    if (index === fromIndex) return arr[toIndex];
+    return item;
+  });
+}
