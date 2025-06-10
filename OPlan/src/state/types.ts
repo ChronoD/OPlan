@@ -7,6 +7,10 @@ export type OPlanState = {
   title: string;
 };
 
+export type OPlanMasterState = {
+  tabs: [0];
+};
+
 export interface OutlineMap {
   [k: string]: NormalizedOutline;
 }

@@ -1,16 +1,16 @@
 import { ReactNode, createContext, useReducer } from "react";
 import { Actions } from "./actions";
-import { initialMasterState, initialState, reducer } from ".";
+import { initialState, reducer } from ".";
 import { OPlanState } from "./types";
 
 // Define the type for your context data
-type AppContextType = {
-  state: OPlanState;
+type TabContextType = {
+  state: OPlanState[];
   dispatch: React.Dispatch<Actions>;
 };
 
 // Create the context with an initial value of null
-export const AppContext = createContext<AppContextType | null>(null);
+export const TabContext = createContext<TabContextType | null>(null);
 
 // Define the props type for the context provider component
 type ContextProviderProps = {
@@ -18,14 +18,14 @@ type ContextProviderProps = {
 };
 
 // Define the provider component
-function AppContextProvider({ children }: ContextProviderProps) {
-  const [state, dispatch] = useReducer(reducer, initialMasterState);
+function TabContextProvider({ children }: ContextProviderProps) {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <TabContext.Provider value={{ state, dispatch }}>
       {children}
-    </AppContext.Provider>
+    </TabContext.Provider>
   );
 }
 
-export default AppContextProvider;
+export default TabContextProvider;

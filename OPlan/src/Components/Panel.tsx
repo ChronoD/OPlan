@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler } from "react";
+import React, { ChangeEvent, ChangeEventHandler, useReducer } from "react";
 import "../App.css";
 import { useAppContext } from "../state/useAppContext";
 import OutlineComponent from "./Outline";
@@ -17,11 +17,30 @@ import {
 import { asOpmlJson, denormalize, toXml } from "../state/functions";
 import UploadIcon from "@mui/icons-material/Upload";
 import SaveTool from "./SaveTool";
+import { buildNewOutline, reducer } from "../state";
 
-function Panel() {
-  const { state, dispatch } = useAppContext();
+function Panel({
+  isVisible,
+  setTabName,
+}: {
+  isVisible: boolean;
+  setTabName: (name: string) => void;
+}) {
+  const [state, dispatch] = useReducer(reducer, {
+    outlines: {
+      ["1"]: buildNewOutline("1"),
+      // ["3"]: buildNewOutlineWithChild("3", "31"),
+      // ["31"]: buildNewOutline("31"),
+    },
+    showXml: true,
+    topOutlineOrder: ["1"],
+    title: "",
+    importXml: null,
+    importEnabled: true,
+  });
 
   function onTitleUpdate(event: ChangeEvent) {
+    setTabName(event.target.value);
     dispatch({
       type: ActionTypes.TITLE_CHANGED,
       payload: { textInput: event.target.value, id: event.target.id },
@@ -112,7 +131,12 @@ function Panel() {
   }
 
   return (
-    <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
+    <div
+      style={{
+        backgroundColor: " rgb(176, 173, 173)",
+        display: isVisible ? "block" : "none",
+      }}
+    >
       <Grid2
         container
         spacing={2}
@@ -152,6 +176,7 @@ function Panel() {
                     outline={out}
                     key={out.id}
                     parentOutlineId={null}
+                    dispatch={dispatch}
                   />
                 ))}
           </div>
