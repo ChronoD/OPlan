@@ -5,68 +5,46 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import Panel from "./Components/Panel.tsx";
 import Tabs, { tabsClasses } from "@mui/material/Tabs";
 import CloseIcon from "@mui/icons-material/Close";
+import { v6 as uuidv6 } from "uuid";
 
 function InterApp() {
-  const [activeTab, setActiveTab] = React.useState<number>(1);
-
-  const [tabs, setTabs] = React.useState<{ id: number; name?: string }[]>([
-    { id: 1 },
+  const [tabs, setTabs] = React.useState<{ id: string; name?: string }[]>([
+    { id: uuidv6() },
   ]);
+  const [activeTab, setActiveTab] = React.useState<string>(tabs[0].id);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log(event.target);
-    console.log(newValue);
-
-    // setActiveTab(Number(event.target.id));
-    setActiveTab(Number(newValue));
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
   };
 
-  function addNewTab(tabNo: number) {
+  function addNewTab() {
     return () => {
-      tabs.push({ id: tabNo });
+      const tabId = uuidv6();
+      tabs.push({ id: tabId });
       setTabs([...tabs]);
-      setActiveTab(tabNo);
+      setActiveTab(tabId);
     };
   }
 
-  function removeTab(tabNo: number) {
+  function removeTab(tabNo: string) {
     return (event: MouseEventHandler<HTMLAnchorElement>) => {
-      // prevent MaterialUI from switching tabs
-      // const tabId = Number(event.target.parentElement.parentElement);
-      // console.log("tabId", tabId);
       event.stopPropagation();
-      // Cases:
-      // Case 1: Single tab.
-      // Case 2: Tab on which it's pressed to delete.
-      // Case 3: Tab on which it's pressed but it's the first tab
-      // Case 4: Rest all cases.
-      // Also cleanup data pertaining to tab.
-      // Case 2,3,4:
-      console.log("tabNo", tabNo);
-
-      if (tabNo === activeTab) {
-        const indexToRemove = tabs.findIndex((tab) => tab.id === tabNo);
-        console.log("indexToRemove", indexToRemove);
-        if (indexToRemove !== undefined) {
-          console.log("tabs", tabs);
-          const newTabs = tabs.filter((tab) => tab.id !== tabNo);
-          console.log(" tabs after", newTabs);
-          setTabs([...newTabs]);
-
-          let newActiveTab = indexToRemove - 1;
-          if (newTabs.length > 1) {
-            setActiveTab(newTabs[newActiveTab].id);
+      if (tabNo === activeTab && tabs.length !== 1) {
+        const indexOfTabToRemove = tabs.findIndex((tab) => tab.id === tabNo);
+        if (indexOfTabToRemove !== undefined) {
+          const updatedTabs = tabs.filter((tab) => tab.id !== tabNo);
+          setTabs([...updatedTabs]);
+          if (updatedTabs.length > 1 && indexOfTabToRemove > 1) {
+            setActiveTab(updatedTabs[indexOfTabToRemove - 1].id);
           } else {
-            setActiveTab(1);
+            setActiveTab(updatedTabs[0].id);
           }
         }
-      } else {
-        console.log("in inactive tab");
       }
     };
   }
 
-  function setTabName(tabNo: number) {
+  function setTabName(tabNo: string) {
     return (tabName: string) => {
       const tabToChangeName = tabs.find((tab) => tab.id === tabNo);
       if (tabToChangeName) {
@@ -83,7 +61,7 @@ function InterApp() {
     <Box
       sx={{
         flexGrow: 1,
-        bgcolor: "background.paper",
+        bgcolor: "transparent",
         margin: "20px",
         display: "flex",
         flexDirection: "column",
@@ -96,7 +74,7 @@ function InterApp() {
           display: "flex",
         }}
       >
-        <IconButton onClick={addNewTab(tabs.length + 1)}>
+        <IconButton onClick={addNewTab()}>
           <CreateNewFolderIcon />
         </IconButton>
         <Tabs
@@ -113,14 +91,20 @@ function InterApp() {
         >
           {tabs.map((tab, index) => (
             <Tab
+              id="sadafsdfa"
               key={index}
               disableRipple
               value={tab.id}
+              sx={{
+                padding: "6px",
+                backgroundColor:
+                  tab.id === activeTab ? "#bdb7b7" : "rgb(176, 173, 173)",
+              }}
               label={
                 <span id={tab.id}>
-                  {tab.name || "Tab " + Number(tab.id)}
+                  {tab.name || "Tab " + index}
                   <IconButton
-                    disabled={tab.id !== activeTab}
+                    disabled={tab.id !== activeTab || tabs.length === 1}
                     size="small"
                     component="span"
                     onClick={removeTab(tab.id)}
@@ -147,40 +131,3 @@ function InterApp() {
 }
 
 export default InterApp;
-
-const TabsMap = () => {
-  const [tabs, setTabs] = useState(Array.from(Array(10).keys()));
-
-  const [activeTab, setActiveTab] = React.useState(0);
-
-  const closeTab = (i) => {
-    if (i === 0) {
-      if (tabs.length > 1) {
-        setTabs(tabs.slice(1, tabs.length));
-        return;
-      }
-
-      setTabs([]);
-      return;
-    }
-
-    if (i === tabs.length - 1) {
-      setTabs(tabs.slice(0, tabs.length - 1));
-      return;
-    }
-
-    setTabs([...tabs.slice(0, i), ...tabs.slice(i + 1, tabs.length)]);
-  };
-
-  return (
-    <div>
-      {tabs.map((k, i) => (
-        <button onClick={() => closeTab(i)}>{k}</button>
-      ))}
-    </div>
-  );
-};
-
-const App = () => {
-  return <TabsMap />;
-};

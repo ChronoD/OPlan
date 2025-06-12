@@ -133,22 +133,17 @@ function Panel({
   return (
     <div
       style={{
-        backgroundColor: " rgb(176, 173, 173)",
+        backgroundColor: "#bdb7b7",
         display: isVisible ? "block" : "none",
       }}
     >
-      <Grid2
-        container
-        spacing={2}
-        style={{ height: "140vh", backgroundColor: "rgb(176, 173, 173)" }}
-      >
+      <Grid2 container spacing={2} style={{ height: "140vh" }}>
         <Grid2
           size={{ xs: 6, md: 8 }}
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
-            backgroundColor: "rgb(176, 173, 173)",
           }}
         >
           <TextareaAutosize
@@ -181,10 +176,7 @@ function Panel({
                 ))}
           </div>
         </Grid2>
-        <Grid2
-          size={{ xs: 6, md: 4 }}
-          style={{ backgroundColor: " rgb(176, 173, 173)" }}
-        >
+        <Grid2 size={{ xs: 6, md: 4 }}>
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <SaveTool
