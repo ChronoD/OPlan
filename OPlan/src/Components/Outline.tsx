@@ -1,6 +1,5 @@
 import "../App.css";
 import { Box, TextareaAutosize } from "@mui/material";
-import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
 import { Actions, ActionTypes } from "../state/actions";
 import { ChangeEvent } from "react";
@@ -133,6 +132,7 @@ function OutlineComponent({
                 key={sub.id}
                 outline={sub}
                 parentOutlineId={outline.id}
+                dispatch={dispatch}
               />
             ))}
       </div>

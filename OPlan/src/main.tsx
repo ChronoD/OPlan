@@ -1,9 +1,9 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import InterApp from "./InterApp.tsx";
+import App from "./App.tsx";
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
-  <InterApp />
+  <App />
   // </StrictMode>
 );

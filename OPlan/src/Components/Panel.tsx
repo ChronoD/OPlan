@@ -1,6 +1,5 @@
-import React, { ChangeEvent, ChangeEventHandler, useReducer } from "react";
+import { ChangeEvent, ChangeEventHandler, useReducer, useEffect } from "react";
 import "../App.css";
-import { useAppContext } from "../state/useAppContext";
 import OutlineComponent from "./Outline";
 import { ActionTypes } from "../state/actions";
 import Preview from "./Preview";
@@ -39,8 +38,11 @@ function Panel({
     importEnabled: true,
   });
 
+  useEffect(() => {
+    setTabName(state.title);
+  }, [state.title]);
+
   function onTitleUpdate(event: ChangeEvent) {
-    setTabName(event.target.value);
     dispatch({
       type: ActionTypes.TITLE_CHANGED,
       payload: { textInput: event.target.value, id: event.target.id },
