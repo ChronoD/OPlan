@@ -1,6 +1,5 @@
-import { ChangeEvent, ChangeEventHandler } from "react";
+import { ChangeEvent, ChangeEventHandler, useReducer, useEffect } from "react";
 import "../App.css";
-import { useAppContext } from "../state/useAppContext";
 import OutlineComponent from "./Outline";
 import { ActionTypes } from "../state/actions";
 import Preview from "./Preview";
@@ -17,9 +16,31 @@ import {
 import { asOpmlJson, denormalize, toXml } from "../state/functions";
 import UploadIcon from "@mui/icons-material/Upload";
 import SaveTool from "./SaveTool";
+import { buildNewOutline, reducer } from "../state";
 
-function Panel() {
-  const { state, dispatch } = useAppContext();
+function Panel({
+  isVisible,
+  setTabName,
+}: {
+  isVisible: boolean;
+  setTabName: (name: string) => void;
+}) {
+  const [state, dispatch] = useReducer(reducer, {
+    outlines: {
+      ["1"]: buildNewOutline("1"),
+      // ["3"]: buildNewOutlineWithChild("3", "31"),
+      // ["31"]: buildNewOutline("31"),
+    },
+    showXml: true,
+    topOutlineOrder: ["1"],
+    title: "",
+    importXml: null,
+    importEnabled: true,
+  });
+
+  useEffect(() => {
+    setTabName(state.title);
+  }, [state.title]);
 
   function onTitleUpdate(event: ChangeEvent) {
     dispatch({
@@ -112,19 +133,19 @@ function Panel() {
   }
 
   return (
-    <div style={{ backgroundColor: " rgb(176, 173, 173)", margin: "20px" }}>
-      <Grid2
-        container
-        spacing={2}
-        style={{ height: "140vh", backgroundColor: "rgb(176, 173, 173)" }}
-      >
+    <div
+      style={{
+        backgroundColor: "#bdb7b7",
+        display: isVisible ? "block" : "none",
+      }}
+    >
+      <Grid2 container spacing={2} style={{ height: "140vh" }}>
         <Grid2
           size={{ xs: 6, md: 8 }}
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
-            backgroundColor: "rgb(176, 173, 173)",
           }}
         >
           <TextareaAutosize
@@ -152,14 +173,12 @@ function Panel() {
                     outline={out}
                     key={out.id}
                     parentOutlineId={null}
+                    dispatch={dispatch}
                   />
                 ))}
           </div>
         </Grid2>
-        <Grid2
-          size={{ xs: 6, md: 4 }}
-          style={{ backgroundColor: " rgb(176, 173, 173)" }}
-        >
+        <Grid2 size={{ xs: 6, md: 4 }}>
           <Grid2 size={8} style={{ width: "100%" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <SaveTool

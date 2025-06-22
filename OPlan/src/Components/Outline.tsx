@@ -1,19 +1,21 @@
 import "../App.css";
 import { Box, TextareaAutosize } from "@mui/material";
-import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
-import { ActionTypes } from "../state/actions";
+import { Actions, ActionTypes } from "../state/actions";
 import { ChangeEvent } from "react";
 import OutlineLeftButtons from "./OutlineLeftButtons";
 
 interface OutlineProps {
   outline: Outline;
   parentOutlineId: string | null;
+  dispatch: React.Dispatch<Actions>;
 }
 
-function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
-  const { dispatch } = useAppContext();
-
+function OutlineComponent({
+  outline,
+  parentOutlineId,
+  dispatch,
+}: OutlineProps) {
   function onAddSiblingClicked() {
     dispatch({
       type: ActionTypes.ADD_SIBLING_CLICKED,
@@ -105,6 +107,7 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
           <OutlineLeftButtons
             outline={outline}
             parentOutlineId={parentOutlineId}
+            dispatch={dispatch}
           />
         </div>
       )}
@@ -129,6 +132,7 @@ function OutlineComponent({ outline, parentOutlineId }: OutlineProps) {
                 key={sub.id}
                 outline={sub}
                 parentOutlineId={outline.id}
+                dispatch={dispatch}
               />
             ))}
       </div>

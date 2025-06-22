@@ -2,7 +2,7 @@ import "../App.css";
 import { Box, IconButton } from "@mui/material";
 import { useAppContext } from "../state/useAppContext";
 import { Outline } from "../state/types";
-import { ActionTypes } from "../state/actions";
+import { Actions, ActionTypes } from "../state/actions";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
@@ -14,11 +14,14 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 interface OutlineProps {
   outline: Outline;
   parentOutlineId: string | null;
+  dispatch: React.Dispatch<Actions>;
 }
 
-function OutlineLeftButtons({ outline, parentOutlineId }: OutlineProps) {
-  const { dispatch } = useAppContext();
-
+function OutlineLeftButtons({
+  outline,
+  parentOutlineId,
+  dispatch,
+}: OutlineProps) {
   function onRemoveClicked(id: string) {
     return () => {
       if (outline.subs.length === 0)

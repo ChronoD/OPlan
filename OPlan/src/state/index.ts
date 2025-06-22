@@ -8,10 +8,16 @@ import {
   moveElementForwardsByOne,
 } from "./functions";
 import { ActionTypes, Actions } from "./actions";
-import { NormalizedOutline, OPlanState, OutlineMap, OutlineRaw } from "./types";
+import {
+  NormalizedOutline,
+  OPlanMasterState,
+  OPlanState,
+  OutlineMap,
+  OutlineRaw,
+} from "./types";
 import opml from "opml";
 
-function buildNewOutline(id: string): NormalizedOutline {
+export function buildNewOutline(id: string): NormalizedOutline {
   return {
     id: id,
     text: "",
@@ -31,6 +37,10 @@ function buildNewOutlineWithChild(
     items: [childId],
   };
 }
+
+export const initialMasterState: OPlanMasterState = {
+  tabs: [0],
+};
 
 export const initialState: OPlanState = {
   outlines: {
@@ -71,7 +81,7 @@ function addIdsMultiple(outlines: OutlineRaw[]): OutlineRaw[] {
   return outlines.map((outline, index) => addIds(outline, index.toString()));
 }
 
-export function reducer(state: OPlanState, action: Actions) {
+export function reducer(state: OPlanState, action: Actions): OPlanState {
   switch (action.type) {
     case ActionTypes.TITLE_CHANGED:
       return {
